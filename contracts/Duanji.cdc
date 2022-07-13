@@ -1,21 +1,23 @@
+import MetadataViews from "./MetadataViews.cdc"
+
 pub contract FunnyThings {
-    pub let FunnyGuyStoragePath: StoragePath;
-    pub let IFunnyGuyPublicPath: PublicPath;
+    pub let PunsterStoragePath: StoragePath;
+    pub let IPunsterPublicPath: PublicPath;
     pub let IFunnyIndexPublicPath: PublicPath;
     // pub let DuanjiStoragePath: StoragePath;
     // pub let IDuanjiPublicPath: PublicPath;
 
-    access(contract) var FunnyGuyTotal: UInt64;
+    access(contract) var PunsterTotal: UInt64;
     access(contract) var DuanjiTotal: UInt64;
 
     init() {
-        self.FunnyGuyStoragePath = /storage/FunnyGuyStoragePath;
-        self.IFunnyGuyPublicPath = /public/IFunnyGuyPublicPath;
+        self.PunsterStoragePath = /storage/PunsterStoragePath;
+        self.IPunsterPublicPath = /public/IPunsterPublicPath;
         self.IFunnyIndexPublicPath = /public/IFunnyIndexPublicPath;
         // self.DuanjiStoragePath = /storage/DuanjiStoragePath;
         // self.IDuanjiPublicPath = /public/IDuanjiPublicPath;
 
-        self.FunnyGuyTotal = 1;
+        self.PunsterTotal = 1;
         self.DuanjiTotal = 1;
     }
 
@@ -25,13 +27,12 @@ pub contract FunnyThings {
     }
 
     // This `I` is not mean 'Interface' but 'Interaction'
-    pub resource interface IFunnyGuy {
+    pub resource interface IPunster {
         // tell-fetch model. 
         // Notify followers to 
         pub fun notify(addr: Address);
         // return last update timestamp, that is `fun getCurrentBlock(): Block`
-        pub fun getLatestUpdate(): UInt64;
-        pub fun getUpdateInfo(timestamp: UInt64);
+        pub fun getLatestUpdate(): UFix64;
 
         // tell-fetch model.
         // Follow some funnyguy
@@ -40,7 +41,7 @@ pub contract FunnyThings {
 
         // Get `Duanji` information
         // Return informations of `Duanji` the time after `timestamp`
-        pub fun getDuanjiFrom(timestamp: UInt64);
+        pub fun getDuanjiFrom(timestamp: UFix64);
         // Return informations of all `Duanji`
         pub fun getAllDuanji();
 
@@ -52,26 +53,22 @@ pub contract FunnyThings {
     }
 
     // `Duanji` is a NFT
-    pub resource Duanji {
+    pub resource Duanji: MetadataViews.Resolver {
         pub let id: UInt64;
+        pub let timestamp: UFix64;
 
-        pub let name: String;
-        pub let description: String;
-        pub let thumbnail: String;
+        pub let metadata: { String: String };
 
         priv let commends: [Address];
         // priv let funnyIndex: UInt32;
 
         init(
             id: UInt64,
-            name: String,
-            description: String,
-            thumbnail: String,
+            metadata: {String: String}
         ) {
             self.id = id;
-            self.name = name;
-            self.description = description;
-            self.thumbnail = thumbnail;
+            self.timestamp = getCurrentBlock().timestamp;
+            self.metadata = metadata;
             self.commends = [];
             // self.funnyIndex = 0;
         }
@@ -102,40 +99,99 @@ pub contract FunnyThings {
         access(contract) fun getFunnyIndex(): UInt32 {
             return self.commends.length as! UInt32;
         }
+
+        pub fun getViews(): [Type] { 
+            return [
+                Type<MetadataViews.Display>()
+            ]
+        }
+
+        pub fun resolveView(_ view: Type): AnyStruct? {
+            switch view {
+                case Type<MetadataViews.Display>():
+                    var ipfsImage = MetadataViews.IPFSFile(cid: "No thumbnail cid set", path: "No thumbnail path set")
+                    if (self.getMetadata().containsKey("thumbnailCID")) {
+                        ipfsImage = MetadataViews.IPFSFile(cid: self.getMetadata()["thumbnailCID"]!, path: self.getMetadata()["thumbnailPath"])
+                    }
+                    return MetadataViews.Display(
+                        name: self.getMetadata()["name"] ?? "Duanji ".concat(self.id.toString()),
+                        description: self.getMetadata()["description"] ?? "No description set",
+                        thumbnail: ipfsImage
+                    )
+            }
+
+            return nil
+        }
+
+        pub fun getMetadata(): {String: String} {
+            return self.metadata;
+        }
     }
 
-    // `FunnyGuy` is a NFT and a NFT collection
+    // `Punster` is a NFT and a NFT collection for `Duanji`
     // This NFT will be locked for a time before being traded again
-    pub resource FunnyGuy {
+    pub resource Punster {
         pub let id: UInt64;
+        pub let timestamp: UFix64;
+        pub let acct: Address;
 
-        pub let name: String;
-        pub let description: String;
-        pub let thumbnail: String;
+        pub let metadata: { String: String };
 
         pub let publishedDuanji: @{UInt64: Duanji};
-        pub let followings: {Address: [UInt64]};
+        pub let followings: [Address];
         pub let followers: [Address];
+
+        pub let followUpdates: {Address: UFix64};
+        priv var latestUpdate: UFix64;
 
         init(
             id: UInt64,
-            name: String,
-            description: String,
-            thumbnail: String,
+            acct: Address,
+            metadata: {String: String}
         ) {
             self.id = id;
-            self.name = name;
-            self.description = description;
-            self.thumbnail = thumbnail;
+            self.timestamp = getCurrentBlock().timestamp;
+            self.acct = acct;
+            self.metadata = metadata;
 
             self.publishedDuanji <- {};
 
-            self.followings = {};
+            self.followings = [];
             self.followers = [];
+
+            self.followUpdates = {};
+            self.latestUpdate = self.timestamp;
         }
 
         destroy () {
             destroy self.publishedDuanji;
+        }
+
+        pub fun getViews(): [Type] { 
+            return [
+                Type<MetadataViews.Display>()
+            ]
+        }
+
+        pub fun resolveView(_ view: Type): AnyStruct? {
+            switch view {
+                case Type<MetadataViews.Display>():
+                    var ipfsImage = MetadataViews.IPFSFile(cid: "No thumbnail cid set", path: "No thumbnail path set")
+                    if (self.getMetadata().containsKey("thumbnailCID")) {
+                        ipfsImage = MetadataViews.IPFSFile(cid: self.getMetadata()["thumbnailCID"]!, path: self.getMetadata()["thumbnailPath"])
+                    }
+                    return MetadataViews.Display(
+                        name: self.getMetadata()["name"] ?? "Punster ".concat(self.id.toString()),
+                        description: self.getMetadata()["description"] ?? "No description set",
+                        thumbnail: ipfsImage
+                    )
+            }
+
+            return nil
+        }
+
+        pub fun getMetadata(): {String: String} {
+            return self.metadata;
         }
 
         // this is a NTF interface 
@@ -149,20 +205,52 @@ pub contract FunnyThings {
 
         // }
         
-        pub fun publishDuanji(
-                                name: String,
-                                description: String,
-                                thumbnail: String,
-                            ){
+        pub fun publishDuanji(metadata: {String: String}) {
 
             let oldToken <-self.publishedDuanji[FunnyThings.DuanjiTotal] <- create Duanji(id: FunnyThings.DuanjiTotal, 
-                                                                                        name: name,
-                                                                                        description: description,
-                                                                                        thumbnail: thumbnail);
+                                                                                        metadata: metadata);
 
             FunnyThings.DuanjiTotal = FunnyThings.DuanjiTotal + 1;
 
+            self.latestUpdate = getCurrentBlock().timestamp;
+
+            for ele in self.followers {
+                let pubAcct = getAccount(ele);
+                let oIPunster = pubAcct.getCapability<&{IPunster}>(FunnyThings.IPunsterPublicPath);
+                if let punsterRef = oIPunster.borrow() {
+                    punsterRef.notify(addr: self.acct);
+                }
+            }
+
             destroy oldToken;
+        }
+
+        // tell-fetch model. 
+        // Notify followers to 
+        pub fun notify(addr: Address) {
+            if (self.followings.contains(addr)) {
+                let pubAcct = getAccount(addr);
+                let oIPunster = pubAcct.getCapability<&{IPunster}>(FunnyThings.IPunsterPublicPath);
+                if let punsterRef = oIPunster.borrow() {
+                    if (!self.followUpdates.containsKey(addr)) {
+                        self.followUpdates[addr] = punsterRef.getLatestUpdate();
+                    }
+                }
+            }
+        }
+        // return last update timestamp, that is `fun getCurrentBlock(): Block`
+        pub fun getLatestUpdate(): UFix64{
+            return self.latestUpdate;
+        }
+
+        // Get `Duanji` information
+        // Return informations of `Duanji` the time after `timestamp`
+        pub fun getDuanjiFrom(timestamp: UFix64){
+
+        }
+        // Return informations of all `Duanji`
+        pub fun getAllDuanji(){
+            
         }
 
         pub fun commendToDuanji() {
@@ -173,33 +261,11 @@ pub contract FunnyThings {
 
         }
 
-        pub fun followSomeone() {
-
-        }
-
-        pub fun beFollowed() {
-
-        }
-
-        pub fun getFollowing(){
-
-        }
-
-        pub fun getFollowers() {
-
-        }
-
-        pub fun isFollowing() {
-
-        }
-
-        pub fun isFollowed() {
-
-        }
+        
     }
 
-    // one account, one `FunnyGuy` NFT
-    pub fun registerFunnyGuy() {
+    // one account, one `Punster` NFT
+    pub fun registerPunster() {
 
     }
 }
