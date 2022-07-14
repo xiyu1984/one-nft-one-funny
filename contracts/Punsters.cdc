@@ -1,7 +1,7 @@
-import MetadataViews from 0x02
-import NonFungibleToken from 0x03
+import MetadataViews from "./MetadataViews.cdc"
+import NonFungibleToken from "./NonFungibleToken.cdc"
 
-pub contract FunnyThings: NonFungibleToken {
+pub contract PunstersNFT: NonFungibleToken {
     // -----------------------------------------------------------------------
     // NonFungibleToken Standard Events
     // -----------------------------------------------------------------------
@@ -12,7 +12,7 @@ pub contract FunnyThings: NonFungibleToken {
     pub var totalSupply: UInt64
     
     // -----------------------------------------------------------------------
-    // FunnyThings
+    // Punsters
     // -----------------------------------------------------------------------
     pub let PunsterStoragePath: StoragePath;
     pub let IPunsterPublicPath: PublicPath;
@@ -48,11 +48,11 @@ pub contract FunnyThings: NonFungibleToken {
 
     pub resource interface IFunnyIndex {
         pub fun getDuanjiFunnyIndex(duanjiID: UInt64): UInt32;
-        pub fun getFunnyGuyFunnyIndex(): UInt32;
+        pub fun getPunsterFunnyIndex(): UInt32;
     }
 
     // This `I` is not mean 'Interface' but 'Interaction'
-    pub resource interface IPunster {
+    pub resource interface IPunsterPublic {
         // tell-fetch model. 
         // Notify followers to 
         pub fun notify(addr: Address);
@@ -64,6 +64,9 @@ pub contract FunnyThings: NonFungibleToken {
         pub fun getDuanjiFrom(timestamp: UFix64): [UInt64];
         // Return informations of all `Duanji`
         pub fun getAllDuanji(): [UInt64];
+        // Return DuanjiView
+        pub fun getDuanjiViewFrom(timestamp: UFix64): [DuanjiView];
+        pub fun getAllDuanjiView(): [DuanjiView];
 
         // tell-fetch model.
         // Follow some funnyguy
@@ -83,7 +86,7 @@ pub contract FunnyThings: NonFungibleToken {
         pub fun deposit(token: @NonFungibleToken.NFT)
         pub fun getIDs(): [UInt64]
         pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
-        pub fun borrowFunnyThings(id: UInt64): &FunnyThings.NFT? {
+        pub fun borrowDuanji(id: UInt64): &PunstersNFT.NFT? {
             post {
                 (result == nil) || (result?.id == id): 
                     "Cannot borrow TestNFTWithViews reference: The ID of the returned reference is incorrect"
@@ -165,6 +168,23 @@ pub contract FunnyThings: NonFungibleToken {
         pub fun getMetadata(): {String: String} {
             return self.metadata;
         }
+
+        pub fun getURL(): String? {
+            return self.metadata["thumbnailCID"];
+        }
+    }
+
+    // Simplified information of `duanji`
+    pub struct DuanjiView {
+        pub let id: UInt64;
+        pub let owner: Address;
+        pub let ipfsUrl: String;
+
+        init(id: UInt64, owner: Address, ipfsUrl: String) {
+            self.id = id;
+            self.owner = owner;
+            self.ipfsUrl = ipfsUrl;
+        }
     }
 
     // `Punster` is a NFT and a NFT collection for `Duanji` NFT
@@ -180,7 +200,7 @@ pub contract FunnyThings: NonFungibleToken {
         pub let followings: [Address];
         pub let followers: [Address];
 
-        pub let followUpdates: {Address: UFix64};
+        priv var followUpdates: {Address: UFix64};
         priv var latestUpdate: UFix64;
 
         init(
@@ -232,7 +252,7 @@ pub contract FunnyThings: NonFungibleToken {
 
         pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
             let nft = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT?
-            let test = nft as! &FunnyThings.NFT
+            let test = nft as! &PunstersNFT.NFT
             return test as &AnyResource{MetadataViews.Resolver}
         }
 
@@ -273,46 +293,23 @@ pub contract FunnyThings: NonFungibleToken {
             return &self.ownedNFTs as &{UInt64: NonFungibleToken.NFT};
         }
 
-        pub fun borrowFunnyThings(id: UInt64): &FunnyThings.NFT? {
+        pub fun borrowDuanji(id: UInt64): &PunstersNFT.NFT? {
             if self.ownedNFTs[id] != nil {
                 let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT?
-                return ref as! &FunnyThings.NFT
+                return ref as! &PunstersNFT.NFT
             } else {
                 return nil
             }
         }
-
+        
         // -----------------------------------------------------------------------
-        // For Punster
+        // Interface IPunsterPublic API
         // -----------------------------------------------------------------------
-        pub fun publishDuanji(metadata: {String: String}) {
-
-            let oldToken <-self.ownedNFTs[FunnyThings.DuanjiTotal] <- create NFT(id: FunnyThings.DuanjiTotal, 
-                                                                                        metadata: metadata);
-
-            FunnyThings.DuanjiTotal = FunnyThings.DuanjiTotal + 1;
-            FunnyThings.totalSupply = FunnyThings.DuanjiTotal;
-
-            self.latestUpdate = getCurrentBlock().timestamp;
-
-            for ele in self.followers {
-                let pubAcct = getAccount(ele);
-                let oIPunster = pubAcct.getCapability<&{IPunster}>(FunnyThings.IPunsterPublicPath);
-                if let punsterRef = oIPunster.borrow() {
-                    punsterRef.notify(addr: self.acct);
-                }
-            }
-
-            destroy oldToken;
-        }
-
         // tell-fetch model. 
         // Notify followers to 
         pub fun notify(addr: Address) {
             if (self.followings.contains(addr)) {
-                let pubAcct = getAccount(addr);
-                let oIPunster = pubAcct.getCapability<&{IPunster}>(FunnyThings.IPunsterPublicPath);
-                if let punsterRef = oIPunster.borrow() {
+                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
                     if (!self.followUpdates.containsKey(addr)) {
                         self.followUpdates[addr] = punsterRef.getLatestUpdate();
                     }
@@ -331,7 +328,7 @@ pub contract FunnyThings: NonFungibleToken {
             var validKeys: [UInt64] = [];
             for ele in duanjiKeys {
                 let nft = &self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?
-                let temp = nft as! &FunnyThings.NFT
+                let temp = nft as! &PunstersNFT.NFT
                 if (temp.timestamp >= timestamp){
                     validKeys.append(ele);
                 }
@@ -345,6 +342,77 @@ pub contract FunnyThings: NonFungibleToken {
             return self.ownedNFTs.keys
         }
 
+        pub fun getDuanjiViewFrom(timestamp: UFix64): [DuanjiView]{
+            var outputViews: [DuanjiView] = [];
+            for ele in self.ownedNFTs.keys {
+                let nft = &self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?;
+                let temp = nft as! &PunstersNFT.NFT;
+                if (temp.timestamp > timestamp) {
+                    if let url = temp.getURL() {
+                        outputViews.append(DuanjiView(id: ele, owner: self.acct, ipfsUrl: url));
+                    }
+                }
+            }
+
+            return outputViews;
+        }
+
+        // Return all DuanjiView
+        // pub fun getAllDuanjiView(): MetadataViews.NFTView {
+        //     let nft = &self.ownedNFTs[0] as auth &NonFungibleToken.NFT?;
+        //     let temp = nft as! &PunstersNFT.NFT;
+        //     return MetadataViews.getNFTView(id: 0, viewResolver: temp as &AnyResource{MetadataViews.Resolver});
+        // }
+        pub fun getAllDuanjiView(): [DuanjiView] {
+            var outputViews: [DuanjiView] = [];
+            for ele in self.ownedNFTs.keys {
+                let nft = &self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?;
+                let temp = nft as! &PunstersNFT.NFT;
+                if let url = temp.getURL() {
+                    outputViews.append(DuanjiView(id: ele, owner: self.acct, ipfsUrl: url));
+                }
+            }
+
+            return outputViews;
+        }
+
+
+        // -----------------------------------------------------------------------
+        // Resouce API
+        // -----------------------------------------------------------------------
+        pub fun publishDuanji(metadata: {String: String}) {
+
+            let oldToken <-self.ownedNFTs[PunstersNFT.DuanjiTotal] <- create NFT(id: PunstersNFT.DuanjiTotal, 
+                                                                                        metadata: metadata);
+
+            PunstersNFT.DuanjiTotal = PunstersNFT.DuanjiTotal + 1;
+            PunstersNFT.totalSupply = PunstersNFT.DuanjiTotal;
+
+            self.latestUpdate = getCurrentBlock().timestamp;
+
+            for ele in self.followers {
+                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: ele) {
+                    punsterRef.notify(addr: self.acct);
+                }
+            }
+
+            destroy oldToken;
+        }
+
+        // returns all 
+        pub fun getAllUpdates(): [DuanjiView] {
+            let outputViews: [DuanjiView] = [];
+            for ele in self.followUpdates.keys {
+                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: ele) {
+                    outputViews.concat(punsterRef.getDuanjiViewFrom(timestamp: self.followUpdates[ele]!));
+                }
+            }
+
+            self.followUpdates = {};
+
+            return outputViews;
+        }
+
         pub fun commendToDuanji() {
 
         }
@@ -352,6 +420,18 @@ pub contract FunnyThings: NonFungibleToken {
         pub fun cancelCommendToDuanji() {
 
         }
+    }
+
+    pub fun getIPunsterFromAddress(addr: Address): &{IPunsterPublic}? {
+        let pubAcct = getAccount(addr);
+        let oIPunster = pubAcct.getCapability<&{IPunsterPublic}>(PunstersNFT.IPunsterPublicPath);
+        return oIPunster.borrow();
+    }
+
+    pub fun getIFunnyIndexFromAddress(addr: Address): &{IFunnyIndex}? {
+        let pubAcct = getAccount(addr);
+        let oIFI = pubAcct.getCapability<&{IFunnyIndex}>(PunstersNFT.IFunnyIndexPublicPath);
+        return oIFI.borrow();
     }
 
     // one account, one `Punster` NFT
