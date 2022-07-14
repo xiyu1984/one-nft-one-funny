@@ -1,6 +1,19 @@
-import MetadataViews from "./MetadataViews.cdc"
+import MetadataViews from 0x02
+import NonFungibleToken from 0x03
 
-pub contract FunnyThings {
+pub contract FunnyThings: NonFungibleToken {
+    // -----------------------------------------------------------------------
+    // NonFungibleToken Standard Events
+    // -----------------------------------------------------------------------
+    pub event ContractInitialized()
+    pub event Withdraw(id: UInt64, from: Address?)
+    pub event Deposit(id: UInt64, to: Address?)
+    
+    pub var totalSupply: UInt64
+    
+    // -----------------------------------------------------------------------
+    // FunnyThings
+    // -----------------------------------------------------------------------
     pub let PunsterStoragePath: StoragePath;
     pub let IPunsterPublicPath: PublicPath;
     pub let IFunnyIndexPublicPath: PublicPath;
@@ -19,6 +32,18 @@ pub contract FunnyThings {
 
         self.PunsterTotal = 1;
         self.DuanjiTotal = 1;
+
+        self.totalSupply = 0;
+    }
+
+    // -----------------------------------------------------------------------
+    // NonFungibleToken Standard Functions
+    // -----------------------------------------------------------------------
+    // This interface is useless 
+    pub fun createEmptyCollection(): @NonFungibleToken.Collection {
+        let punsterRes <- create Collection(id: self.PunsterTotal, acct: 0x00, metadata: {});
+        self.PunsterTotal = self.PunsterTotal + 1; 
+        return <-punsterRes
     }
 
     pub resource interface IFunnyIndex {
@@ -34,26 +59,40 @@ pub contract FunnyThings {
         // return last update timestamp, that is `fun getCurrentBlock(): Block`
         pub fun getLatestUpdate(): UFix64;
 
+        // Get `Duanji` information
+        // Return informations of `Duanji` the time after `timestamp`
+        pub fun getDuanjiFrom(timestamp: UFix64): [UInt64];
+        // Return informations of all `Duanji`
+        pub fun getAllDuanji(): [UInt64];
+
         // tell-fetch model.
         // Follow some funnyguy
         pub fun follow(addr: Address, link: String);
         pub fun isFollowing(addr: Address);
 
-        // Get `Duanji` information
-        // Return informations of `Duanji` the time after `timestamp`
-        pub fun getDuanjiFrom(timestamp: UFix64);
-        // Return informations of all `Duanji`
-        pub fun getAllDuanji();
 
         // tell-fetch model
         // Receive `Duanji` commending from others
         pub fun ReceiveCommend(addr: Address, duanjiID: UInt64);
         pub fun ReceiveCancelCommend(addr: Address, duanjiID: UInt64);
         pub fun isCommended(duanjiID: UInt64);
+
+        // -----------------------------------------------------------------------
+        // NFT operations
+        // -----------------------------------------------------------------------
+        pub fun deposit(token: @NonFungibleToken.NFT)
+        pub fun getIDs(): [UInt64]
+        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT
+        pub fun borrowFunnyThings(id: UInt64): &FunnyThings.NFT? {
+            post {
+                (result == nil) || (result?.id == id): 
+                    "Cannot borrow TestNFTWithViews reference: The ID of the returned reference is incorrect"
+            }
+        }
     }
 
-    // `Duanji` is a NFT
-    pub resource Duanji: MetadataViews.Resolver {
+    // `Duanji` NFT
+    pub resource NFT: NonFungibleToken.INFT, MetadataViews.Resolver {
         pub let id: UInt64;
         pub let timestamp: UFix64;
 
@@ -128,16 +167,16 @@ pub contract FunnyThings {
         }
     }
 
-    // `Punster` is a NFT and a NFT collection for `Duanji`
+    // `Punster` is a NFT and a NFT collection for `Duanji` NFT
     // This NFT will be locked for a time before being traded again
-    pub resource Punster {
+    pub resource Collection: NonFungibleToken.INFT, MetadataViews.Resolver, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
         pub let id: UInt64;
         pub let timestamp: UFix64;
         pub let acct: Address;
 
         pub let metadata: { String: String };
+        pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT};
 
-        pub let publishedDuanji: @{UInt64: Duanji};
         pub let followings: [Address];
         pub let followers: [Address];
 
@@ -153,8 +192,7 @@ pub contract FunnyThings {
             self.timestamp = getCurrentBlock().timestamp;
             self.acct = acct;
             self.metadata = metadata;
-
-            self.publishedDuanji <- {};
+            self.ownedNFTs <- {};
 
             self.followings = [];
             self.followers = [];
@@ -164,9 +202,43 @@ pub contract FunnyThings {
         }
 
         destroy () {
-            destroy self.publishedDuanji;
+            destroy self.ownedNFTs;
         }
 
+        // -----------------------------------------------------------------------
+        // NonFungibleToken Standard Functions---Collection
+        // -----------------------------------------------------------------------
+        pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
+            let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
+            emit Withdraw(id: token.id, from: self.owner?.address)
+            return <-(token as! @NonFungibleToken.NFT)
+        }
+
+        pub fun deposit(token: @NonFungibleToken.NFT) {
+            let token <- token as! @NFT
+            let id: UInt64 = token.id
+            let oldToken <- self.ownedNFTs[id] <- token
+            emit Deposit(id: id, to: self.owner?.address)
+            destroy oldToken
+        }
+
+        pub fun getIDs(): [UInt64] {
+            return self.ownedNFTs.keys
+        }
+
+        pub fun borrowNFT(id: UInt64): &NonFungibleToken.NFT {
+            return (&self.ownedNFTs[id] as &NonFungibleToken.NFT?)!
+        }
+
+        pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
+            let nft = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT?
+            let test = nft as! &FunnyThings.NFT
+            return test as &AnyResource{MetadataViews.Resolver}
+        }
+
+        // -----------------------------------------------------------------------
+        // NonFungibleToken Standard Functions---NFT
+        // -----------------------------------------------------------------------
         pub fun getViews(): [Type] { 
             return [
                 Type<MetadataViews.Display>()
@@ -181,7 +253,7 @@ pub contract FunnyThings {
                         ipfsImage = MetadataViews.IPFSFile(cid: self.getMetadata()["thumbnailCID"]!, path: self.getMetadata()["thumbnailPath"])
                     }
                     return MetadataViews.Display(
-                        name: self.getMetadata()["name"] ?? "Punster ".concat(self.id.toString()),
+                        name: self.getMetadata()["name"] ?? "Duanji ".concat(self.id.toString()),
                         description: self.getMetadata()["description"] ?? "No description set",
                         thumbnail: ipfsImage
                     )
@@ -194,23 +266,32 @@ pub contract FunnyThings {
             return self.metadata;
         }
 
-        // this is a NTF interface 
-        // pub fun withdraw(withdrawID: UInt64): @Duanji {
+        // -----------------------------------------------------------------------
+        // For collections
+        // -----------------------------------------------------------------------
+        pub fun getOwnedNFTsRef(): &{UInt64: NonFungibleToken.NFT} {
+            return &self.ownedNFTs as &{UInt64: NonFungibleToken.NFT};
+        }
 
-        // }
+        pub fun borrowFunnyThings(id: UInt64): &FunnyThings.NFT? {
+            if self.ownedNFTs[id] != nil {
+                let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT?
+                return ref as! &FunnyThings.NFT
+            } else {
+                return nil
+            }
+        }
 
-        // `Duanji` transferring
-        // A NFT interface
-        // pub fun deposit(duanji: @Duanji) {
-
-        // }
-        
+        // -----------------------------------------------------------------------
+        // For Punster
+        // -----------------------------------------------------------------------
         pub fun publishDuanji(metadata: {String: String}) {
 
-            let oldToken <-self.publishedDuanji[FunnyThings.DuanjiTotal] <- create Duanji(id: FunnyThings.DuanjiTotal, 
+            let oldToken <-self.ownedNFTs[FunnyThings.DuanjiTotal] <- create NFT(id: FunnyThings.DuanjiTotal, 
                                                                                         metadata: metadata);
 
             FunnyThings.DuanjiTotal = FunnyThings.DuanjiTotal + 1;
+            FunnyThings.totalSupply = FunnyThings.DuanjiTotal;
 
             self.latestUpdate = getCurrentBlock().timestamp;
 
@@ -245,12 +326,23 @@ pub contract FunnyThings {
 
         // Get `Duanji` information
         // Return informations of `Duanji` the time after `timestamp`
-        pub fun getDuanjiFrom(timestamp: UFix64){
+        pub fun getDuanjiFrom(timestamp: UFix64): [UInt64]{
+            let duanjiKeys = self.ownedNFTs.keys;
+            var validKeys: [UInt64] = [];
+            for ele in duanjiKeys {
+                let nft = &self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?
+                let temp = nft as! &FunnyThings.NFT
+                if (temp.timestamp >= timestamp){
+                    validKeys.append(ele);
+                }
+            }
 
+            return validKeys;
         }
+
         // Return informations of all `Duanji`
-        pub fun getAllDuanji(){
-            
+        pub fun getAllDuanji(): [UInt64]{
+            return self.ownedNFTs.keys
         }
 
         pub fun commendToDuanji() {
@@ -260,12 +352,13 @@ pub contract FunnyThings {
         pub fun cancelCommendToDuanji() {
 
         }
-
-        
     }
 
     // one account, one `Punster` NFT
-    pub fun registerPunster() {
-
+    // This function is used for everyone to create 
+    pub fun registerPunster(addr: Address, metadata: {String: String}): @Collection{
+        let punsterRes <- create Collection(id: self.PunsterTotal, acct: addr, metadata: metadata);
+        self.PunsterTotal = self.PunsterTotal + 1; 
+        return <-punsterRes
     }
 }
