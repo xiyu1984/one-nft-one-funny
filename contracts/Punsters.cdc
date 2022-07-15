@@ -25,6 +25,7 @@ pub contract PunstersNFT: NonFungibleToken {
 
     pub let cidKey: String;
     pub let pathKey: String;
+    pub let descriptionKey: String;
 
     init() {
         self.PunsterStoragePath = /storage/PunsterStoragePath;
@@ -40,6 +41,7 @@ pub contract PunstersNFT: NonFungibleToken {
         
         self.cidKey = "thumbnailCID";
         self.pathKey = "thumbnailPath";
+        self.descriptionKey = "description";
     }
 
     // -----------------------------------------------------------------------
@@ -47,7 +49,7 @@ pub contract PunstersNFT: NonFungibleToken {
     // -----------------------------------------------------------------------
     // This interface is useless 
     pub fun createEmptyCollection(): @NonFungibleToken.Collection {
-        let punsterRes <- create Collection(id: self.PunsterTotal, acct: 0x00, ipfsURL: "");
+        let punsterRes <- create Collection(id: self.PunsterTotal, acct: 0x00, description: "", ipfsURL: "");
         self.PunsterTotal = self.PunsterTotal + 1; 
         return <-punsterRes
     }
@@ -105,19 +107,21 @@ pub contract PunstersNFT: NonFungibleToken {
         pub let id: UInt64;
         pub let timestamp: UFix64;
 
-        pub let metadata: { String: String };
+        pub let metadata: { String: AnyStruct};
 
         priv let commends: [Address];
         // priv let funnyIndex: UInt32;
 
         init(
             id: UInt64,
+            description: String,
             ipfsURL: String
         ) {
             self.id = id;
             self.timestamp = getCurrentBlock().timestamp;
             self.metadata = {};
             self.metadata[PunstersNFT.cidKey] = ipfsURL;
+            self.metadata[PunstersNFT.descriptionKey] = description;
             self.commends = [];
             // self.funnyIndex = 0;
         }
@@ -149,35 +153,102 @@ pub contract PunstersNFT: NonFungibleToken {
             return self.commends.length as! UInt32;
         }
 
-        pub fun getViews(): [Type] { 
+       pub fun getViews(): [Type] {
             return [
-                Type<MetadataViews.Display>()
+                Type<MetadataViews.Display>(),
+                Type<MetadataViews.Royalties>(),
+                Type<MetadataViews.Editions>(),
+                Type<MetadataViews.ExternalURL>(),
+                Type<MetadataViews.NFTCollectionData>(),
+                Type<MetadataViews.NFTCollectionDisplay>(),
+                Type<MetadataViews.Serial>(),
+                Type<MetadataViews.Traits>()
             ]
         }
 
         pub fun resolveView(_ view: Type): AnyStruct? {
             switch view {
                 case Type<MetadataViews.Display>():
-                    var ipfsImage = MetadataViews.IPFSFile(cid: "No thumbnail cid set", path: "No thumbnail path set")
-                    if (self.getMetadata().containsKey(PunstersNFT.cidKey)) {
-                        ipfsImage = MetadataViews.IPFSFile(cid: self.getMetadata()[PunstersNFT.cidKey]!, path: self.getMetadata()[PunstersNFT.pathKey])
-                    }
                     return MetadataViews.Display(
-                        name: self.getMetadata()["name"] ?? "Duanji ".concat(self.id.toString()),
-                        description: self.getMetadata()["description"] ?? "No description set",
-                        thumbnail: ipfsImage
+                        name: "DuanjiNFT".concat(self.id.toString()),
+                        description: self.metadata[PunstersNFT.descriptionKey]! as! String,
+                        thumbnail: MetadataViews.IPFSFile(
+                            url: self.metadata[PunstersNFT.cidKey]! as! String, path: nil
+                        )
                     )
-            }
+                case Type<MetadataViews.Editions>():
+                    // There is no max number of NFTs that can be minted from this contract
+                    // so the max edition field value is set to nil
+                    let editionInfo = MetadataViews.Edition(name: "PunStar Hackathon Edition", number: self.id, max: nil)
+                    let editionList: [MetadataViews.Edition] = [editionInfo]
+                    return MetadataViews.Editions(
+                        editionList
+                    )
+                case Type<MetadataViews.Serial>():
+                    return MetadataViews.Serial(
+                        self.id
+                    )
+                case Type<MetadataViews.Royalties>():
+                    return MetadataViews.Royalties(
+                        []
+                    )
+                case Type<MetadataViews.ExternalURL>():
+                    return MetadataViews.ExternalURL(self.metadata[PunstersNFT.cidKey]! as! String)
+                case Type<MetadataViews.NFTCollectionData>():
+                    return MetadataViews.NFTCollectionData(
+                        storagePath: PunstersNFT.PunsterStoragePath,
+                        publicPath: PunstersNFT.IPunsterPublicPath,
+                        providerPath: /private/PunsterNFTCollection,
+                        publicCollection: Type<&PunstersNFT.Collection{PunstersNFT.IPunsterPublic}>(),
+                        publicLinkedType: Type<&PunstersNFT.Collection{PunstersNFT.IPunsterPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
+                        providerLinkedType: Type<&PunstersNFT.Collection{PunstersNFT.IPunsterPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
+                        createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
+                            return <-PunstersNFT.createEmptyCollection()
+                        })
+                    )
+                case Type<MetadataViews.NFTCollectionDisplay>():
+                    let media = MetadataViews.Media(
+                        file: MetadataViews.IPFSFile(
+                            url: self.metadata[PunstersNFT.cidKey]! as! String, path: nil
+                        ),
+                        mediaType: "image/svg+xml"
+                    )
+                    return MetadataViews.NFTCollectionDisplay(
+                        name: "The Example Collection",
+                        description: "This collection is used as an example to help you develop your next Flow NFT.",
+                        externalURL: MetadataViews.ExternalURL(self.metadata[PunstersNFT.cidKey]! as! String),
+                        squareImage: media,
+                        bannerImage: media,
+                        socials: {
+                            "twitter": MetadataViews.ExternalURL("https://twitter.com/flow_blockchain")
+                        }
+                    )
+                case Type<MetadataViews.Traits>():
+                    // exclude mintedTime and foo to show other uses of Traits
+                    let excludedTraits = ["mintedTime", "foo"]
+                    let traitsView = MetadataViews.dictToTraits(dict: self.metadata, excludedNames: excludedTraits)
 
+                    // mintedTime is a unix timestamp, we should mark it with a displayType so platforms know how to show it.
+                    let mintedTimeTrait = MetadataViews.Trait(name: "mintedTime", value: self.timestamp, displayType: "Date", rarity: nil)
+                    traitsView.addTrait(mintedTimeTrait)
+
+                    // foo is a trait with its own rarity
+                    let fooTraitRarity = MetadataViews.Rarity(score: 10.0, max: 100.0, description: "Common")
+                    let fooTrait = MetadataViews.Trait(name: "foo", value: self.metadata["foo"], displayType: nil, rarity: fooTraitRarity)
+                    traitsView.addTrait(fooTrait)
+                    
+                    return traitsView
+
+            }
             return nil
         }
 
-        pub fun getMetadata(): {String: String} {
+        pub fun getMetadata(): {String: AnyStruct} {
             return self.metadata;
         }
 
         pub fun getURL(): String? {
-            return self.metadata["thumbnailCID"];
+            return self.metadata[PunstersNFT.cidKey] as! String?;
         }
     }
 
@@ -201,7 +272,7 @@ pub contract PunstersNFT: NonFungibleToken {
         pub let timestamp: UFix64;
         pub let acct: Address;
 
-        pub let metadata: { String: String };
+        pub let metadata: { String: AnyStruct };
         pub var ownedNFTs: @{UInt64: NonFungibleToken.NFT};
 
         pub let followings: [Address];
@@ -213,6 +284,7 @@ pub contract PunstersNFT: NonFungibleToken {
         init(
             id: UInt64,
             acct: Address,
+            description: String,
             ipfsURL: String
         ) {
             self.id = id;
@@ -220,6 +292,7 @@ pub contract PunstersNFT: NonFungibleToken {
             self.acct = acct;
             self.metadata = {};
             self.metadata[PunstersNFT.cidKey] = ipfsURL;
+            self.metadata[PunstersNFT.descriptionKey] = description;
             self.ownedNFTs <- {};
 
             self.followings = [];
@@ -278,11 +351,11 @@ pub contract PunstersNFT: NonFungibleToken {
                 case Type<MetadataViews.Display>():
                     var ipfsImage = MetadataViews.IPFSFile(cid: "No thumbnail cid set", path: "No thumbnail path set")
                     if (self.getMetadata().containsKey(PunstersNFT.cidKey)) {
-                        ipfsImage = MetadataViews.IPFSFile(cid: self.getMetadata()[PunstersNFT.cidKey]!, path: self.getMetadata()[PunstersNFT.pathKey])
+                        ipfsImage = MetadataViews.IPFSFile(cid: self.getMetadata()[PunstersNFT.cidKey]! as! String, path: self.getMetadata()[PunstersNFT.pathKey] as! String?)
                     }
                     return MetadataViews.Display(
-                        name: self.getMetadata()["name"] ?? "Duanji ".concat(self.id.toString()),
-                        description: self.getMetadata()["description"] ?? "No description set",
+                        name: self.getMetadata()["name"] as! String? ?? "PunStar".concat(self.id.toString()),
+                        description: self.getMetadata()["description"] as! String? ?? "No description set",
                         thumbnail: ipfsImage
                     )
             }
@@ -290,7 +363,7 @@ pub contract PunstersNFT: NonFungibleToken {
             return nil
         }
 
-        pub fun getMetadata(): {String: String} {
+        pub fun getMetadata(): {String: AnyStruct} {
             return self.metadata;
         }
 
@@ -388,9 +461,10 @@ pub contract PunstersNFT: NonFungibleToken {
         // -----------------------------------------------------------------------
         // Resouce API
         // -----------------------------------------------------------------------
-        pub fun publishDuanji(ipfsURL: String) {
+        pub fun publishDuanji(description: String, ipfsURL: String) {
 
             let oldToken <-self.ownedNFTs[PunstersNFT.DuanjiTotal] <- create NFT(id: PunstersNFT.DuanjiTotal, 
+                                                                                        description: description,
                                                                                         ipfsURL: ipfsURL);
 
             PunstersNFT.DuanjiTotal = PunstersNFT.DuanjiTotal + 1;
@@ -444,8 +518,8 @@ pub contract PunstersNFT: NonFungibleToken {
 
     // one account, one `Punster` NFT
     // This function is used for everyone to create 
-    pub fun registerPunster(addr: Address, ipfsURL: String): @Collection{
-        let punsterRes <- create Collection(id: self.PunsterTotal, acct: addr, ipfsURL: ipfsURL);
+    pub fun registerPunster(addr: Address, description: String, ipfsURL: String): @Collection{
+        let punsterRes <- create Collection(id: self.PunsterTotal, acct: addr, description: description, ipfsURL: ipfsURL);
         self.PunsterTotal = self.PunsterTotal + 1; 
         return <-punsterRes
     }
