@@ -78,8 +78,8 @@ pub contract PunstersNFT: NonFungibleToken {
 
         // tell-fetch model.
         // Follow some funnyguy
-        pub fun follow(addr: Address, link: String);
-        pub fun isFollowing(addr: Address);
+        pub fun followedBy(addr: Address);
+        pub fun isFollowing(addr: Address): Bool;
 
 
         // tell-fetch model
@@ -199,9 +199,9 @@ pub contract PunstersNFT: NonFungibleToken {
                         storagePath: PunstersNFT.PunsterStoragePath,
                         publicPath: PunstersNFT.IPunsterPublicPath,
                         providerPath: /private/PunsterNFTCollection,
-                        publicCollection: Type<&PunstersNFT.Collection{PunstersNFT.IPunsterPublic}>(),
-                        publicLinkedType: Type<&PunstersNFT.Collection{PunstersNFT.IPunsterPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-                        providerLinkedType: Type<&PunstersNFT.Collection{PunstersNFT.IPunsterPublic,NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
+                        publicCollection: Type<&PunstersNFT.Collection>(),
+                        publicLinkedType: Type<&PunstersNFT.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
+                        providerLinkedType: Type<&PunstersNFT.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
                         createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
                             return <-PunstersNFT.createEmptyCollection()
                         })
@@ -214,8 +214,8 @@ pub contract PunstersNFT: NonFungibleToken {
                         mediaType: "image/svg+xml"
                     )
                     return MetadataViews.NFTCollectionDisplay(
-                        name: "The Example Collection",
-                        description: "This collection is used as an example to help you develop your next Flow NFT.",
+                        name: "The Punster Collection",
+                        description: "This collection is a punster to publish your Duanji Flow NFT.",
                         externalURL: MetadataViews.ExternalURL(self.metadata[PunstersNFT.cidKey]! as! String),
                         squareImage: media,
                         bannerImage: media,
@@ -332,7 +332,7 @@ pub contract PunstersNFT: NonFungibleToken {
         }
 
         pub fun borrowViewResolver(id: UInt64): &AnyResource{MetadataViews.Resolver} {
-            let nft = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT?
+            let nft = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
             let test = nft as! &PunstersNFT.NFT
             return test as &AnyResource{MetadataViews.Resolver}
         }
@@ -376,7 +376,7 @@ pub contract PunstersNFT: NonFungibleToken {
 
         pub fun borrowDuanji(id: UInt64): &PunstersNFT.NFT? {
             if self.ownedNFTs[id] != nil {
-                let ref = &self.ownedNFTs[id] as auth &NonFungibleToken.NFT?
+                let ref = (&self.ownedNFTs[id] as auth &NonFungibleToken.NFT?)!
                 return ref as! &PunstersNFT.NFT
             } else {
                 return nil
@@ -408,7 +408,7 @@ pub contract PunstersNFT: NonFungibleToken {
             let duanjiKeys = self.ownedNFTs.keys;
             var validKeys: [UInt64] = [];
             for ele in duanjiKeys {
-                let nft = &self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?
+                let nft = (&self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?)!
                 let temp = nft as! &PunstersNFT.NFT
                 if (temp.timestamp >= timestamp){
                     validKeys.append(ele);
@@ -426,7 +426,7 @@ pub contract PunstersNFT: NonFungibleToken {
         pub fun getDuanjiViewFrom(timestamp: UFix64): [DuanjiView]{
             var outputViews: [DuanjiView] = [];
             for ele in self.ownedNFTs.keys {
-                let nft = &self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?;
+                let nft = (&self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?)!
                 let temp = nft as! &PunstersNFT.NFT;
                 if (temp.timestamp > timestamp) {
                     if let url = temp.getURL() {
@@ -439,15 +439,10 @@ pub contract PunstersNFT: NonFungibleToken {
         }
 
         // Return all DuanjiView
-        // pub fun getAllDuanjiView(): MetadataViews.NFTView {
-        //     let nft = &self.ownedNFTs[0] as auth &NonFungibleToken.NFT?;
-        //     let temp = nft as! &PunstersNFT.NFT;
-        //     return MetadataViews.getNFTView(id: 0, viewResolver: temp as &AnyResource{MetadataViews.Resolver});
-        // }
         pub fun getAllDuanjiView(): [DuanjiView] {
             var outputViews: [DuanjiView] = [];
             for ele in self.ownedNFTs.keys {
-                let nft = &self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?;
+                let nft = (&self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?)!
                 let temp = nft as! &PunstersNFT.NFT;
                 if let url = temp.getURL() {
                     outputViews.append(DuanjiView(id: ele, owner: self.acct, ipfsUrl: url));
@@ -455,6 +450,26 @@ pub contract PunstersNFT: NonFungibleToken {
             }
 
             return outputViews;
+        }
+
+        // tell-fetch model.
+        // Follow other punster
+        pub fun followedBy(addr: Address) {
+            if (!self.followers.contains(addr)) {
+                let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr);
+                if (punsterRef.isFollowing(addr: self.acct)) {
+                    self.followers.append(addr);
+                }
+            }
+        }
+
+        // Tell other punster I'm following him
+        pub fun isFollowing(addr: Address): Bool {
+            if (self.followings.contains(addr)) {
+                return true;
+            } else {
+                return false;
+            }
         }
 
 
@@ -493,6 +508,14 @@ pub contract PunstersNFT: NonFungibleToken {
             self.followUpdates = {};
 
             return outputViews;
+        }
+
+        pub fun followSomeone(addr: Address) {
+            if (!self.followings.contains(addr)) {
+                let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr);
+                self.followings.append(addr);
+                punsterRef.followedBy(addr: self.acct);
+            }
         }
 
         pub fun commendToDuanji() {
