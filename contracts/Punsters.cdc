@@ -55,7 +55,7 @@ pub contract PunstersNFT: NonFungibleToken {
     }
 
     pub resource interface IFunnyIndex {
-        pub fun getDuanjiFunnyIndex(duanjiID: UInt64): UInt32;
+        pub fun getDuanjiFunnyIndex(duanjiID: UInt64): UInt32?;
         pub fun getPunsterFunnyIndex(): UInt32;
     }
 
@@ -81,12 +81,16 @@ pub contract PunstersNFT: NonFungibleToken {
         pub fun followedBy(addr: Address);
         pub fun isFollowing(addr: Address): Bool;
 
+        // Public query information of follow machanism
+        pub fun getFollowings(): [Address];
+        pub fun getFollowers(): [Address];
+
 
         // tell-fetch model
         // Receive `Duanji` commending from others
         pub fun ReceiveCommend(addr: Address, duanjiID: UInt64);
         pub fun ReceiveCancelCommend(addr: Address, duanjiID: UInt64);
-        pub fun isCommended(duanjiID: UInt64);
+        pub fun isCommended(duanjiID: UInt64): Bool;
 
         // -----------------------------------------------------------------------
         // NFT operations
@@ -199,9 +203,9 @@ pub contract PunstersNFT: NonFungibleToken {
                         storagePath: PunstersNFT.PunsterStoragePath,
                         publicPath: PunstersNFT.IPunsterPublicPath,
                         providerPath: /private/PunsterNFTCollection,
-                        publicCollection: Type<&PunstersNFT.Collection>(),
-                        publicLinkedType: Type<&PunstersNFT.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
-                        providerLinkedType: Type<&PunstersNFT.Collection{NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
+                        publicCollection: Type<&PunstersNFT.Collection{IPunsterPublic}>(),
+                        publicLinkedType: Type<&PunstersNFT.Collection{IPunsterPublic, NonFungibleToken.CollectionPublic,NonFungibleToken.Receiver,MetadataViews.ResolverCollection}>(),
+                        providerLinkedType: Type<&PunstersNFT.Collection{IPunsterPublic, NonFungibleToken.CollectionPublic,NonFungibleToken.Provider,MetadataViews.ResolverCollection}>(),
                         createEmptyCollectionFunction: (fun (): @NonFungibleToken.Collection {
                             return <-PunstersNFT.createEmptyCollection()
                         })
@@ -267,7 +271,7 @@ pub contract PunstersNFT: NonFungibleToken {
 
     // `Punster` is a NFT and a NFT collection for `Duanji` NFT
     // This NFT will be locked for a time before being traded again
-    pub resource Collection: NonFungibleToken.INFT, MetadataViews.Resolver, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+    pub resource Collection: IPunsterPublic, NonFungibleToken.INFT, MetadataViews.Resolver, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
         pub let id: UInt64;
         pub let timestamp: UFix64;
         pub let acct: Address;
@@ -280,6 +284,8 @@ pub contract PunstersNFT: NonFungibleToken {
 
         priv var followUpdates: {Address: UFix64};
         priv var latestUpdate: UFix64;
+
+        priv let commended: [UInt64];
 
         init(
             id: UInt64,
@@ -300,6 +306,8 @@ pub contract PunstersNFT: NonFungibleToken {
 
             self.followUpdates = {};
             self.latestUpdate = self.timestamp;
+
+            self.commended = [];
         }
 
         destroy () {
@@ -456,9 +464,10 @@ pub contract PunstersNFT: NonFungibleToken {
         // Follow other punster
         pub fun followedBy(addr: Address) {
             if (!self.followers.contains(addr)) {
-                let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr);
-                if (punsterRef.isFollowing(addr: self.acct)) {
-                    self.followers.append(addr);
+                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr){
+                    if (punsterRef.isFollowing(addr: self.acct)) {
+                        self.followers.append(addr);
+                    }
                 }
             }
         }
@@ -472,6 +481,44 @@ pub contract PunstersNFT: NonFungibleToken {
             }
         }
 
+        // Public query information of follow machanism
+        pub fun getFollowings(): [Address] {
+            return self.followings;
+        }
+
+        pub fun getFollowers(): [Address] {
+            return self.followers;
+        }
+
+        // tell-fetch model
+        // Receive `Duanji` commending from others
+        pub fun ReceiveCommend(addr: Address, duanjiID: UInt64) {
+            if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
+                if (punsterRef.isCommended(duanjiID: duanjiID)) {
+                    if let duanji = self.borrowDuanji(id: duanjiID) {
+                        duanji.commend(addr: addr);
+                    }
+                }
+            }
+        }
+
+        pub fun ReceiveCancelCommend(addr: Address, duanjiID: UInt64){
+            if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
+                if (!punsterRef.isCommended(duanjiID: duanjiID)) {
+                    if let duanji = self.borrowDuanji(id: duanjiID) {
+                        duanji.cancelCommend(addr: addr);
+                    }
+                }
+            }
+        }
+
+        pub fun isCommended(duanjiID: UInt64): Bool {
+            if (self.commended.contains(duanjiID)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 
         // -----------------------------------------------------------------------
         // Resouce API
@@ -512,18 +559,29 @@ pub contract PunstersNFT: NonFungibleToken {
 
         pub fun followSomeone(addr: Address) {
             if (!self.followings.contains(addr)) {
-                let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr);
-                self.followings.append(addr);
-                punsterRef.followedBy(addr: self.acct);
+                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr){
+                    self.followings.append(addr);
+                    punsterRef.followedBy(addr: self.acct);
+                }
             }
         }
 
-        pub fun commendToDuanji() {
-
+        pub fun commendToDuanji(addr: Address, duanjiID: UInt64) {
+            if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
+                if (!self.commended.contains(duanjiID)) {
+                    self.commended.append(duanjiID);
+                }
+                punsterRef.ReceiveCommend(addr: self.acct, duanjiID: duanjiID);
+            }
         }
 
-        pub fun cancelCommendToDuanji() {
-
+        pub fun cancelCommendToDuanji(addr: Address, duanjiID: UInt64) {
+            if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
+                if let idx = self.commended.firstIndex(of: duanjiID) {
+                    self.commended.remove(at: idx);
+                }
+                punsterRef.ReceiveCommend(addr: self.acct, duanjiID: duanjiID);
+            }
         }
     }
 
