@@ -16,21 +16,23 @@ pub contract PunstersNFT: NonFungibleToken {
     // -----------------------------------------------------------------------
     pub let PunsterStoragePath: StoragePath;
     pub let IPunsterPublicPath: PublicPath;
-    pub let IFunnyIndexPublicPath: PublicPath;
+    // pub let IFunnyIndexPublicPath: PublicPath;
     // pub let DuanjiStoragePath: StoragePath;
     // pub let IDuanjiPublicPath: PublicPath;
 
     access(contract) var PunsterTotal: UInt64;
     access(contract) var DuanjiTotal: UInt64;
-
+    
     pub let cidKey: String;
     pub let pathKey: String;
     pub let descriptionKey: String;
 
+    access(contract) let registeredPunsters: {UInt64: Address};
+
     init() {
         self.PunsterStoragePath = /storage/PunsterStoragePath;
         self.IPunsterPublicPath = /public/IPunsterPublicPath;
-        self.IFunnyIndexPublicPath = /public/IFunnyIndexPublicPath;
+        // self.IFunnyIndexPublicPath = /public/IFunnyIndexPublicPath;
         // self.DuanjiStoragePath = /storage/DuanjiStoragePath;
         // self.IDuanjiPublicPath = /public/IDuanjiPublicPath;
 
@@ -38,6 +40,7 @@ pub contract PunstersNFT: NonFungibleToken {
         self.DuanjiTotal = 1;
 
         self.totalSupply = 0;
+        self.registeredPunsters = {};
         
         self.cidKey = "thumbnailCID";
         self.pathKey = "thumbnailPath";
@@ -52,11 +55,6 @@ pub contract PunstersNFT: NonFungibleToken {
         let punsterRes <- create Collection(id: self.PunsterTotal, acct: 0x00, description: "", ipfsURL: "");
         self.PunsterTotal = self.PunsterTotal + 1; 
         return <-punsterRes
-    }
-
-    pub resource interface IFunnyIndex {
-        pub fun getDuanjiFunnyIndex(duanjiID: UInt64): UInt32?;
-        pub fun getPunsterFunnyIndex(): UInt32;
     }
 
     // This `I` is not mean 'Interface' but 'Interaction'
@@ -75,6 +73,7 @@ pub contract PunstersNFT: NonFungibleToken {
         // Return DuanjiView
         pub fun getDuanjiViewFrom(timestamp: UFix64): [DuanjiView];
         pub fun getAllDuanjiView(): [DuanjiView];
+        pub fun getLatestDuanjiView(): DuanjiView?;
 
         // tell-fetch model.
         // Follow some funnyguy
@@ -85,12 +84,18 @@ pub contract PunstersNFT: NonFungibleToken {
         pub fun getFollowings(): [Address];
         pub fun getFollowers(): [Address];
 
+        pub fun getAllFollowingDuanji(): [DuanjiView];
+        pub fun getFollowingUpdates(): [DuanjiView];
+
 
         // tell-fetch model
         // Receive `Duanji` commending from others
         pub fun ReceiveCommend(addr: Address, duanjiID: UInt64);
         pub fun ReceiveCancelCommend(addr: Address, duanjiID: UInt64);
         pub fun isCommended(duanjiID: UInt64): Bool;
+
+        // FunnyIndex
+        pub fun getFunnyIndex(): UInt32;
 
         // -----------------------------------------------------------------------
         // NFT operations
@@ -157,7 +162,7 @@ pub contract PunstersNFT: NonFungibleToken {
             return self.commends.length as! UInt32;
         }
 
-       pub fun getViews(): [Type] {
+        pub fun getViews(): [Type] {
             return [
                 Type<MetadataViews.Display>(),
                 Type<MetadataViews.Royalties>(),
@@ -261,11 +266,13 @@ pub contract PunstersNFT: NonFungibleToken {
         pub let id: UInt64;
         pub let owner: Address;
         pub let ipfsUrl: String;
+        pub let funnyIndex: UInt32;
 
-        init(id: UInt64, owner: Address, ipfsUrl: String) {
+        init(id: UInt64, owner: Address, ipfsUrl: String, fidx: UInt32) {
             self.id = id;
             self.owner = owner;
             self.ipfsUrl = ipfsUrl;
+            self.funnyIndex = fidx;
         }
     }
 
@@ -282,7 +289,7 @@ pub contract PunstersNFT: NonFungibleToken {
         pub let followings: [Address];
         pub let followers: [Address];
 
-        priv var followUpdates: {Address: UFix64};
+        priv var duanjiUpdates: [DuanjiView];
         priv var latestUpdate: UFix64;
 
         priv let commended: [UInt64];
@@ -304,7 +311,7 @@ pub contract PunstersNFT: NonFungibleToken {
             self.followings = [];
             self.followers = [];
 
-            self.followUpdates = {};
+            self.duanjiUpdates = [];
             self.latestUpdate = self.timestamp;
 
             self.commended = [];
@@ -399,12 +406,13 @@ pub contract PunstersNFT: NonFungibleToken {
         pub fun notify(addr: Address) {
             if (self.followings.contains(addr)) {
                 if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
-                    if (!self.followUpdates.containsKey(addr)) {
-                        self.followUpdates[addr] = punsterRef.getLatestUpdate();
+                    if let dv = punsterRef.getLatestDuanjiView() {
+                        self.duanjiUpdates.append(dv);
                     }
                 }
             }
         }
+
         // return last update timestamp, that is `fun getCurrentBlock(): Block`
         pub fun getLatestUpdate(): UFix64{
             return self.latestUpdate;
@@ -438,7 +446,7 @@ pub contract PunstersNFT: NonFungibleToken {
                 let temp = nft as! &PunstersNFT.NFT;
                 if (temp.timestamp > timestamp) {
                     if let url = temp.getURL() {
-                        outputViews.append(DuanjiView(id: ele, owner: self.acct, ipfsUrl: url));
+                        outputViews.append(DuanjiView(id: ele, owner: self.acct, ipfsUrl: url, fidx: temp.getFunnyIndex()));
                     }
                 }
             }
@@ -446,18 +454,32 @@ pub contract PunstersNFT: NonFungibleToken {
             return outputViews;
         }
 
-        // Return all DuanjiView
+        // Return all of the punster's DuanjiViews
         pub fun getAllDuanjiView(): [DuanjiView] {
             var outputViews: [DuanjiView] = [];
             for ele in self.ownedNFTs.keys {
                 let nft = (&self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?)!
                 let temp = nft as! &PunstersNFT.NFT;
                 if let url = temp.getURL() {
-                    outputViews.append(DuanjiView(id: ele, owner: self.acct, ipfsUrl: url));
+                    outputViews.append(DuanjiView(id: ele, owner: self.acct, ipfsUrl: url, fidx: temp.getFunnyIndex()));
                 }
             }
 
             return outputViews;
+        }
+
+        pub fun getLatestDuanjiView(): DuanjiView? {
+            let lastKeyIndex = self.ownedNFTs.keys.length - 1;
+            if (lastKeyIndex >= 0) {
+                let id = self.ownedNFTs.keys[lastKeyIndex]
+                if let nft = self.borrowDuanji(id: id) {
+                    if let url = nft.getURL() {
+                        return DuanjiView(id: nft.id, owner: self.acct, ipfsUrl: url, fidx: nft.getFunnyIndex());
+                    }
+                }
+            }
+
+            return nil;
         }
 
         // tell-fetch model.
@@ -490,6 +512,22 @@ pub contract PunstersNFT: NonFungibleToken {
             return self.followers;
         }
 
+        // returns duanji views of all the following punsters
+        pub fun getAllFollowingDuanji(): [DuanjiView] {
+            let outputViews: [DuanjiView] = [];
+            for ele in self.followings {
+                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: ele) {
+                    outputViews.concat(punsterRef.getAllDuanjiView());
+                }
+            }
+            return outputViews;
+        }
+
+        // returns all latest update duanji view
+        pub fun getFollowingUpdates(): [DuanjiView] {
+            return self.duanjiUpdates;
+        }
+
         // tell-fetch model
         // Receive `Duanji` commending from others
         pub fun ReceiveCommend(addr: Address, duanjiID: UInt64) {
@@ -520,6 +558,18 @@ pub contract PunstersNFT: NonFungibleToken {
             }
         }
 
+        pub fun getFunnyIndex(): UInt32{
+            var fi: UInt32 = 0;
+
+            for ele in self.ownedNFTs.keys {
+                let nft = (&self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?)!
+                let temp = nft as! &PunstersNFT.NFT;
+                fi = fi + temp.getFunnyIndex();
+            }
+
+            return fi;
+        }
+
         // -----------------------------------------------------------------------
         // Resouce API
         // -----------------------------------------------------------------------
@@ -543,18 +593,8 @@ pub contract PunstersNFT: NonFungibleToken {
             destroy oldToken;
         }
 
-        // returns all 
-        pub fun getAllUpdates(): [DuanjiView] {
-            let outputViews: [DuanjiView] = [];
-            for ele in self.followUpdates.keys {
-                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: ele) {
-                    outputViews.concat(punsterRef.getDuanjiViewFrom(timestamp: self.followUpdates[ele]!));
-                }
-            }
-
-            self.followUpdates = {};
-
-            return outputViews;
+        pub fun clearUpdate() {
+            self.duanjiUpdates = [];
         }
 
         pub fun followSomeone(addr: Address) {
@@ -591,17 +631,36 @@ pub contract PunstersNFT: NonFungibleToken {
         return oIPunster.borrow();
     }
 
-    pub fun getIFunnyIndexFromAddress(addr: Address): &{IFunnyIndex}? {
-        let pubAcct = getAccount(addr);
-        let oIFI = pubAcct.getCapability<&{IFunnyIndex}>(PunstersNFT.IFunnyIndexPublicPath);
-        return oIFI.borrow();
-    }
-
     // one account, one `Punster` NFT
     // This function is used for everyone to create 
     pub fun registerPunster(addr: Address, description: String, ipfsURL: String): @Collection{
         let punsterRes <- create Collection(id: self.PunsterTotal, acct: addr, description: description, ipfsURL: ipfsURL);
         self.PunsterTotal = self.PunsterTotal + 1; 
+        self.registeredPunsters[punsterRes.id] = addr;
         return <-punsterRes
+    }
+
+    // view registed `Punsters`
+    pub fun getRegisteredPunsters(): {UInt64: Address} {
+        return self.registeredPunsters;
+    }
+
+    // Get Funny Index
+    pub fun getDuanjiFunnyIndex(ownerAddr: Address, duanjiID: UInt64): UInt32?{
+        if let punsterRef = self.getIPunsterFromAddress(addr: ownerAddr) {
+            if let duanji = punsterRef.borrowDuanji(id: duanjiID) {
+                return duanji.getFunnyIndex();
+            }
+        }
+
+        return nil;
+    }
+
+    pub fun getPunsterFunnyIndex(ownerAddr: Address): UInt32? {
+        if let punsterRef = self.getIPunsterFromAddress(addr: ownerAddr) {
+            return punsterRef.getFunnyIndex();
+        }
+
+        return nil;
     }
 }
