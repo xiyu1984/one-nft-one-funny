@@ -1,2 +1,8 @@
-flow accounts get 0x33a8abe2196c9e15 -n testnet
+flow accounts get 0x05ede3f803407aae -n testnet
 
+flow accounts add-contract FungibleToken ./contracts/utility/FungibleToken.cdc -n testnet --signer testnet-Alice
+flow accounts add-contract "NonFungibleToken" ./contracts/NonFungibleToken.cdc -n testnet --signer testnet-Alice
+flow accounts add-contract "MetadataViews" ./contracts/MetadataViews.cdc -n testnet --signer testnet-Alice
+flow accounts add-contract "PunstersNFT" ./contracts/Punsters.cdc -n testnet --signer testnet-Alice
+
+flow transactions send ./test-transaction/remove.cdc --signer testnet-account -n testnet

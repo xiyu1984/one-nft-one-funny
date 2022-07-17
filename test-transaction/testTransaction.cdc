@@ -1,5 +1,5 @@
-import TestNFTWithViews from 0x05
-import NonFungibleToken from 0x03
+import TestNFTWithViews from 0x05ede3f803407aae
+import NonFungibleToken from 0x05ede3f803407aae
 
 transaction {
 

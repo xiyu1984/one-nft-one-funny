@@ -1,5 +1,5 @@
-import MetadataViews from "./MetadataViews.cdc"
-import NonFungibleToken from "./NonFungibleToken.cdc"
+import MetadataViews from 0x05ede3f803407aae
+import NonFungibleToken from 0x05ede3f803407aae
 
 pub contract PunstersNFT: NonFungibleToken {
     // -----------------------------------------------------------------------
