@@ -159,7 +159,8 @@ pub contract PunstersNFT: NonFungibleToken {
         }
 
         access(contract) fun getFunnyIndex(): UInt32 {
-            return self.commends.length as! UInt32;
+            // return self.commends.length as! UInt32;
+            return UInt32(self.commends.length);
         }
 
         pub fun getViews(): [Type] {
@@ -514,10 +515,10 @@ pub contract PunstersNFT: NonFungibleToken {
 
         // returns duanji views of all the following punsters
         pub fun getAllFollowingDuanji(): [DuanjiView] {
-            let outputViews: [DuanjiView] = [];
+            var outputViews: [DuanjiView] = [];
             for ele in self.followings {
                 if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: ele) {
-                    outputViews.concat(punsterRef.getAllDuanjiView());
+                    outputViews = outputViews.concat(punsterRef.getAllDuanjiView());
                 }
             }
             return outputViews;
