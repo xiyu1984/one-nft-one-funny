@@ -76,8 +76,9 @@ pub contract PunstersNFT: NonFungibleToken {
         pub fun getLatestDuanjiView(): DuanjiView?;
 
         // tell-fetch model.
-        // Follow some funnyguy
+        // Follow/Unfollow some funnyguy
         pub fun followedBy(addr: Address);
+        pub fun cancelFollowedBy(addr: Address)
         pub fun isFollowing(addr: Address): Bool;
 
         // Public query information of follow machanism
@@ -484,12 +485,23 @@ pub contract PunstersNFT: NonFungibleToken {
         }
 
         // tell-fetch model.
-        // Follow other punster
+        // Followed by other punster
         pub fun followedBy(addr: Address) {
             if (!self.followers.contains(addr)) {
                 if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr){
                     if (punsterRef.isFollowing(addr: self.acct)) {
                         self.followers.append(addr);
+                    }
+                }
+            }
+        }
+
+        // Unfollowed by other punster
+        pub fun cancelFollowedBy(addr: Address) {
+            if let idx = self.followers.firstIndex(of: addr) {
+                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
+                    if (!punsterRef.isFollowing(addr: self.acct)) {
+                        self.followers.remove(at: idx);
                     }
                 }
             }
@@ -607,6 +619,17 @@ pub contract PunstersNFT: NonFungibleToken {
             }
         }
 
+        pub fun cancelFollow(addr: Address) {
+            if (self.followings.contains(addr)) {
+                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
+                    if let idx = self.followings.firstIndex(of: addr) {
+                        self.followings.remove(at: idx);
+                        punsterRef.cancelFollowedBy(addr: self.acct);
+                    }
+                }
+            }
+        }
+
         pub fun commendToDuanji(addr: Address, duanjiID: UInt64) {
             if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
                 if (!self.commended.contains(duanjiID)) {
@@ -621,7 +644,7 @@ pub contract PunstersNFT: NonFungibleToken {
                 if let idx = self.commended.firstIndex(of: duanjiID) {
                     self.commended.remove(at: idx);
                 }
-                punsterRef.ReceiveCommend(addr: self.acct, duanjiID: duanjiID);
+                punsterRef.ReceiveCancelCommend(addr: self.acct, duanjiID: duanjiID);
             }
         }
     }
