@@ -38,11 +38,14 @@ If one person likes a `Duanji`, he can `commend` it, so that, the "Funny Index" 
 - [x] Social relationship based on following mechanism 
 - [x] NFT cross-chain bridge betweed Flow and opensea(Rinkeby)
 
-## 团队成员
+## Team
 
-| 姓名 Name | 角色 Role     | 个人经历 Bio | 联系方式 Contact     |
+| Name | Role     | Bio | Contact     |
 | ---- | ------------------- | --- | ----------------------- |
-| Alex | Full-Stack Engineer | ... | Github账号 / 微信 / 邮件  |
+| Xiyu | Full-Stack Engineer |  do<br>other | [Github](https://github.com/xiyu1984)  |
+| Zation | Full-Stack Engineer | ... | [Github](https://github.com/xiyu1984)  |
+| Zack W | Full-Stack Engineer | ... | [Github](https://github.com/xiyu1984)  |
+| Jason | All-round talent | ... | Weixin id: *HopeOfTown*. Weixin Name: *404NotFound*  |
 
 # API for Developers
 The transactions and scripts to invoke resource operations and query resource statements are as follows:
