@@ -1,11 +1,48 @@
 # PunStar
 # Introduction
+PunStar is a social platform for funny things. People participating in `PunStar` are called `Punster`, who can share their funny things in the form of `Duanji`. `Punsters` can construct social relationships by...
+## Highlights
+* Assetization of social relationships  
+We have built a following mechanism to ... So the social relationship is constructed by ...
+* Assetization of funny things  
+We have built a funny index mechanism to ...
+* Assets in PunStar can be Omnichain swaped
+
+
 
 ## Background
+- Target audience
+- Evidence for the need
 
 ## Solution
+### Product  
+If one person thinks someother `punsters` are interesting, he can `follow` them to get the newest information as soon as the followed `punsters` publishing any updates.  
+If one person likes a `Duanji`, he can `commend` it, so that, the "Funny Index" of the `Duanji` will be increased, and the related `punster` who punlished the `Duanji`.
+### Technology Architecture
+### Logo
+### Marketing
 
 # Programming in Web3 Jam
+*Cadence Smart Contract*
+
+- [x] NFT standard smart contract for `Duanji`
+- [x] NFT smart contract for `Punster`
+- [x] The following mechanism between `Punsters`
+- [x] The commend mechanism for `Duanji` by `Punsters`
+- [x] The funny index mechanism for `Duanji` and `Punsters`
+- [x] The multi-chain swap and trading system(Flow and opensea on Rinkeby)
+
+*Client*
+
+- [x] Personal show page with related account(following `punsters`, `duanji`, recommended `duanji` with high funny index, etc.)
+- [x] Social relationship based on following mechanism 
+- [x] NFT cross-chain bridge betweed Flow and opensea(Rinkeby)
+
+## 团队成员
+
+| 姓名 Name | 角色 Role     | 个人经历 Bio | 联系方式 Contact     |
+| ---- | ------------------- | --- | ----------------------- |
+| Alex | Full-Stack Engineer | ... | Github账号 / 微信 / 邮件  |
 
 # API for Developers
 The transactions and scripts to invoke resource operations and query resource statements are as follows:
