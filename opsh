@@ -7,12 +7,15 @@ flow accounts add-contract "PunstersNFT" ./contracts/Punsters.cdc -n testnet --s
 
 flow accounts update-contract "PunstersNFT" ./contracts/Punsters.cdc -n testnet --signer testnet-Alice
 
-# transactions
 
+# transactions
+# Publish `Duanji`
+flow transactions send ./transaction/PublishDuanji.cdc "I found the dog is so funny!" "ipfs uri 2 is defined" --signer testnet-account -n testnet
 
 # View(with scripts)
 # query all 'duanji' from a Address
 flow scripts execute ./scripts/queryDuanjiFrom.cdc 0x33a8abe2196c9e15 -n testnet
+
 
 # `remove` is temporarily forbidden 
 flow transactions send ./transaction/remove.cdc --signer testnet-account -n testnet
