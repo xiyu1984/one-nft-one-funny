@@ -1,14 +1,19 @@
 # PunStar
 # Introduction
-PunStar is a social platform for funny things. People participating in `PunStar` are called `Punster`, who can share their funny things in the form of `Duanji`. `Punsters` can construct social relationships by...
+PunStar is a social platform for funny things. People participating in `PunStar` are called `Punsters`(a NFT), who can share their funny things in the form of `Duanji`(a NFT). Each person can express their preference of a `Duanji`, which can inspire the social relationships to be constructed between participants. 
+
 ## Highlights
-* Assetization of social relationships  
-We have built a following mechanism to ... So the social relationship is constructed by ...
-* Assetization of funny things  
-We have built a funny index mechanism to ...
-* Assets in PunStar can be Omnichain swaped
+* **Assetization of social relationships**  
+As we know, in resource-oriented languages each resource can actually **have** its own abilities, such as its social relationships based on `following` mechanism. This is very different from the smart contract based chains where everything is published on smart contracts. Resource can be exchanged, so the relationship can be exchanged too. This improves the potential value of the `Punster` NFT, as we can bring in advertisement mechanism in the future for example. `Punsters` with more followers might be more valuable. 
 
+* **Assetization of funny things** 
+As every participants can express their preference of a `Dunaji`, the funny index of a `Duanji` and `Punsters` can be evaluated, which may improve their market performance.
 
+* Advertisement mechanism based on `funny index` evaluation  
+`Punsters` can push advertisement to their followers if some special conditions are satisfied.
+
+* Assets in PunStar can be exchanged cross-chain  
+Interesting things should be shared to others.
 
 ## Background
 - Target audience
@@ -16,9 +21,21 @@ We have built a funny index mechanism to ...
 
 ## Solution
 ### Product  
-If one person thinks someother `punsters` are interesting, he can `follow` them to get the newest information as soon as the followed `punsters` publishing any updates.  
-If one person likes a `Duanji`, he can `commend` it, so that, the "Funny Index" of the `Duanji` will be increased, and the related `punster` who punlished the `Duanji`.
+(need a picture to explain)
+* People publish `Duanji` to share funny things.
+* If one person thinks someother `punsters` are interesting, he can `follow` them to get the newest information as soon as the followed `punsters` publishing any updates.  
+* If one person likes a `Duanji`, he can `commend` it, so that, the "Funny Index" of the `Duanji` will be increased, and the related `punster` who punlished the `Duanji`.
+* Both `Duanji` and `Punster` are NFTs which can be exchanged between different participants.
+* `Punsters` can push advertisement to their followers based on the `funny index`.
+
 ### Technology Architecture
+(need a technical picture to explain)  
+The key points of the technology are as follows:  
+* `Following` mechanism can be implemented easily on Flow by resource interactions. 
+* `Funny index` evaluation algorithm in `Commend` mechanism can make out an estimation of how funny a `Duanji` or a `Punster` is.
+* Advertisement mechanism based on `funny index` of `Punsters`.
+* A cross-chain trading market system.
+
 ### Logo
 ### Marketing
 
@@ -30,22 +47,23 @@ If one person likes a `Duanji`, he can `commend` it, so that, the "Funny Index" 
 - [x] The following mechanism between `Punsters`
 - [x] The commend mechanism for `Duanji` by `Punsters`
 - [x] The funny index mechanism for `Duanji` and `Punsters`
-- [x] The multi-chain swap and trading system(Flow and opensea on Rinkeby)
+- [x] A cross-chain marketing(between Flow and opensea on Rinkeby for instance)
 
 *Client*
 
-- [x] Personal show page with related account(following `punsters`, `duanji`, recommended `duanji` with high funny index, etc.)
-- [x] Social relationship based on following mechanism 
-- [x] NFT cross-chain bridge betweed Flow and opensea(Rinkeby)
+- [x] Personal page for each `Punster`: 
+    - [x] The information of following `Punsters`, followers, `Duanji`, recommended `Duanji` with high funny index, etc.
+    - [x] The operations such as publish `Duanji`, commend `Duanji`, follow other `Punster`, etc. 
+    - [x] The interface of advertisement mechanism.
 
 ## Team
 
 | Name | Role     | Bio | Contact     |
 | ---- | ------------------- | --- | ----------------------- |
-| Xiyu | Full-Stack Engineer |  do<br>other | [Github](https://github.com/xiyu1984)  |
+| Xiyu | Full-Stack Engineer | ... | [Github](https://github.com/xiyu1984)  |
 | Zation | Full-Stack Engineer | ... | [Github](https://github.com/xiyu1984)  |
 | Zack W | Full-Stack Engineer | ... | [Github](https://github.com/xiyu1984)  |
-| Jason | All-round talent | ... | Weixin id: *HopeOfTown*. Weixin Name: *404NotFound*  |
+| Jason | All-round talent | ... | Weixin id: *HopeOfTown* <br> Weixin Name: *404NotFound*  |
 
 # API for Developers
 The transactions and scripts to invoke resource operations and query resource statements are as follows:
