@@ -3,15 +3,22 @@ flow accounts get 0x05ede3f803407aae -n testnet
 flow accounts add-contract FungibleToken ./contracts/utility/FungibleToken.cdc -n testnet --signer testnet-Alice
 flow accounts add-contract "NonFungibleToken" ./contracts/NonFungibleToken.cdc -n testnet --signer testnet-Alice
 flow accounts add-contract "MetadataViews" ./contracts/MetadataViews.cdc -n testnet --signer testnet-Alice
-flow accounts add-contract "PunstersNFT" ./contracts/Punsters.cdc -n testnet --signer testnet-
+flow accounts add-contract "PunstersNFT" ./contracts/Punsters.cdc -n testnet --signer testnet-Alice
 
 flow accounts update-contract "PunstersNFT" ./contracts/Punsters.cdc -n testnet --signer testnet-Alice
 
-# `remove` is temporarily forbidden 
+# transactions
 
-flow transactions send ./test-transaction/remove.cdc --signer testnet-account -n testnet
 
-# Register and publish one
-flow transactions send ./test-transaction/RegisterAndPublish.cdc --signer testnet-account -n testnet
-
+# View(with scripts)
+# query all 'duanji' from a Address
 flow scripts execute ./scripts/queryDuanjiFrom.cdc 0x33a8abe2196c9e15 -n testnet
+
+# `remove` is temporarily forbidden 
+flow transactions send ./transaction/remove.cdc --signer testnet-account -n testnet
+
+
+# For test
+# Register and publish one
+flow transactions send ./transaction/test/RegisterAndPublish.cdc --signer testnet-account -n testnet
+
