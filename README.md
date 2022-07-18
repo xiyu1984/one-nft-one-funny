@@ -4,7 +4,7 @@ PunStar is a social platform for funny things. People participating in `PunStar`
 
 ## Highlights
 * **Assetization of social relationships**  
-As we know, in resource-oriented languages each resource can actually **have** its own abilities, such as its social relationships based on `following` mechanism. This is very different from the smart contract based chains where everything is published on smart contracts. Resource can be exchanged, so the relationship can be exchanged too. This improves the potential value of the `Punster` NFT, as we can bring in advertisement mechanism in the future for example. `Punsters` with more followers might be more valuable. 
+As we know, in resource-oriented cadence every things can be bound to each resource, so the resource can actually **have** its own abilities, such as its social relationships based on `following` mechanism. This is very different from the smart contract based chains where everything is published on smart contracts. Resource can be exchanged, so the bound abilities such as relationships can be exchanged too. This improves the potential value of the `Punster` NFT, as we can bring in advertisement mechanism in the future for example. `Punsters` with more followers might be more valuable. 
 
 * **Assetization of funny things** 
 As every participants can express their preference of a `Dunaji`, the funny index of a `Duanji` and `Punsters` can be evaluated, which may improve their market performance.
