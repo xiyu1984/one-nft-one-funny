@@ -9,6 +9,9 @@ flow accounts update-contract "PunstersNFT" ./contracts/Punsters.cdc -n testnet 
 
 
 # transactions
+# Register `Punster`
+flow transactions send ./transaction/RegisterPunster.cdc "I'm a funny punster!" "Punster Alice's ipfs url" --signer testnet-Alice -n testnet
+
 # Publish `Duanji`
 flow transactions send ./transaction/PublishDuanji.cdc "I found the dog is so funny!" "ipfs uri 2 is defined" --signer testnet-account -n testnet
 
