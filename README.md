@@ -1,6 +1,6 @@
 # PunStar
 # Introduction
-PunStar is a social platform based on funny. punStar participants are called "Punsters" (an NFT) and they can share their funny things in the form of "segments" (an NFT). Each person can express their preference for a "segment", which can stimulate the construction of social relationships between participants. In addition, we have created advertising mechanisms to demonstrate the interesting executable capabilities based on Flow's unique resource mechanism, which will be a great improvement for NFTs.
+PunStar is a social platform based on funny. punStar participants are called "Punsters" (an NFT) and they can share their funny things in the form of "Duanji" (an NFT). Each person can express their preference for a "Duanji", which can stimulate the construction of social relationships between participants. In addition, we have created advertising mechanisms to demonstrate the interesting executable capabilities based on Flow's unique resource mechanism, which will be a great improvement for NFTs.
 
 ## Highlights
 * **Assetization of social relationships**  
