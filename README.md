@@ -35,7 +35,7 @@ We can find some similar successful products in the Web2 world, such as Facebook
 (need a technical picture to explain)  
 The key points of the technology are as follows:  
 * `Following` mechanism can be implemented easily on Flow by resource interactions. 
-* `Funny index` evaluation algorithm in the `Commend` mechanism can make out an estimation of how funny a `Duanji` or a `Punster` is, which depends both on commending counts and time passed.
+* `Funny index` evaluation algorithm in the `Commend` mechanism can make out an estimation of how funny a `Duanji` or a `Punster` is, which depends on both commending counts and time passed.
 * Advertisement mechanism based on `funny index` of `Punsters`.
 * A cross-chain trading market system.
 
@@ -74,35 +74,35 @@ The transactions and scripts to invoke resource operations and query resource st
 ## Transactions
 The deployed address on Testnet is: *0x05ede3f803407aae* 
 
-### [Register `Punster`](./transaction/RegisterPunster.cdc)
+### [Register `Punster`](./transaction/registerPunster.cdc)
 The related `Flow CLI` is as follow: 
 ```sh
-flow transactions send ./transaction/RegisterPunster.cdc "I'm a funny punster!" "Punster Alice's ipfs url" --signer <signer-account-info> -n testnet
+flow transactions send ./transaction/registerPunster.cdc "I'm a funny punster!" "Punster Alice's ipfs url" --signer <signer-account-info> -n testnet
 ```
 * The first parameter `"I'm a funny punster!"` is `description`
 * The second parameter `"Punster Alice's ipfs url"` is `ipfsURL`
 * Every account can only invoke `register` once
 
-### [Publish `Duanji`](./transaction/PublishDuanji.cdc)
+### [Publish `Duanji`](./transaction/publishDuanji.cdc)
 The related `Flow CLI` is as follow:
 ```sh
-flow transactions send ./transaction/PublishDuanji.cdc "I found the dog is so funny!" "ipfs uri 2 is defined" --signer <signer-account-info> -n testnet
+flow transactions send ./transaction/publishDuanji.cdc "I found the dog is so funny!" "ipfs uri 2 is defined" --signer <signer-account-info> -n testnet
 ```
 * The first parameter `"I found the dog is so funny!"` is `discription`
 * The second parameter `"ipfs uri 2 is defined"` is `ipfsURL`
 
-### [Commend to `Duanji`](./transaction/CommendTo.cdc)
+### [Commend to `Duanji`](./transaction/commendTo.cdc)
 The related `Flow CLI` is as follow:
 ```sh
-flow transactions send ./transaction/CommendTo.cdc 0x05ede3f803407aae 3 --signer <signer-account-info> -n testnet
+flow transactions send ./transaction/commendTo.cdc 0x05ede3f803407aae 3 --signer <signer-account-info> -n testnet
 ```
 * The first parameter`0x05ede3f803407aae` is the owner address
 * The second parameter `3` is the id of duanji 
 
-### [Cancel commend to `Duanji`](./transaction/CancelCommendTo.cdc)
+### [Cancel commend to `Duanji`](./transaction/cancelCommendTo.cdc)
 The related `Flow CLI` is as follow:
 ```sh
-flow transactions send ./transaction/CancelCommendTo.cdc 0x05ede3f803407aae 3 --signer <signer-account-info> -n testnet
+flow transactions send ./transaction/cancelCommendTo.cdc 0x05ede3f803407aae 3 --signer <signer-account-info> -n testnet
 ```
 * The first parameter`0x05ede3f803407aae` is the owner address
 * The second parameter `3` is the id of duanji 
@@ -172,3 +172,16 @@ flow scripts execute ./scripts/getFollowingUpdates.cdc 0x33a8abe2196c9e15 -n tes
 ```
 * The first parameter `0x33a8abe2196c9e15` is the address of a punster
 * You can get the duanji information in one punster's following update cache, which is mentioned in [Clear following updates](#clear-following-updates)
+
+### [query all punsters](./scripts/queryAllPunsters.cdc)
+The related `Flow CLI` is as follow:
+```sh
+flow scripts execute ./scripts/queryAllPunsters.cdc -n testnet
+```
+
+### [query punster view](./scripts/getPunsterView.cdc)
+The related `Flow CLI` is as follow:
+```sh
+flow scripts execute ./scripts/getPunsterView.cdc 0x05ede3f803407aae -n testnet
+```
+* The first parameter `0x05ede3f803407aae` is the address of a punster

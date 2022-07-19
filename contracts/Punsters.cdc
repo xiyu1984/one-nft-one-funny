@@ -98,6 +98,9 @@ pub contract PunstersNFT: NonFungibleToken {
         // FunnyIndex
         pub fun getFunnyIndex(): UInt32;
 
+        // Punster View
+        pub fun getPunsterView(): AnyStruct?;
+
         // -----------------------------------------------------------------------
         // NFT operations
         // -----------------------------------------------------------------------
@@ -583,6 +586,10 @@ pub contract PunstersNFT: NonFungibleToken {
             return fi;
         }
 
+        pub fun getPunsterView(): AnyStruct? {
+            return self.resolveView(Type<MetadataViews.Display>());
+        }
+
         // -----------------------------------------------------------------------
         // Resouce API
         // -----------------------------------------------------------------------
@@ -667,6 +674,10 @@ pub contract PunstersNFT: NonFungibleToken {
     // view registed `Punsters`
     pub fun getRegisteredPunsters(): {UInt64: Address} {
         return self.registeredPunsters;
+    }
+
+    access(contract) fun destroyPunsters(punsterID: UInt64) {
+        self.registeredPunsters.remove(key: punsterID);
     }
 
     // Get Funny Index

@@ -37,6 +37,9 @@ flow transactions send ./transaction/unfollowTo.cdc 0x05ede3f803407aae --signer 
 # Clear following updates
 flow transactions send ./transaction/clearUpdates.cdc --signer testnet-account -n testnet
 
+# Destroy Punster
+flow transactions send ./transaction/destroyPunster.cdc --signer testnet-account -n testnet
+
 
 # ------------------------------------------------------------------------
 # View(with scripts)
@@ -57,6 +60,12 @@ flow scripts execute ./scripts/getFollowings.cdc 0x33a8abe2196c9e15 -n testnet
 
 # query following duanji updates
 flow scripts execute ./scripts/getFollowingUpdates.cdc 0x33a8abe2196c9e15 -n testnet
+
+# query all punsters
+flow scripts execute ./scripts/queryAllPunsters.cdc -n testnet
+
+# query punster view
+flow scripts execute ./scripts/getPunsterView.cdc 0x05ede3f803407aae -n testnet
 
 
 # ------------------------------------------------------------------------
