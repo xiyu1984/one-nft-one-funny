@@ -74,11 +74,8 @@ pub contract PunstersNFT: NonFungibleToken {
 
         // Get `Duanji` information
         // Return informations of `Duanji` the time after `timestamp`
-        pub fun getDuanjiFrom(timestamp: UFix64): [UInt64];
-        // Return informations of all `Duanji`
-        pub fun getAllDuanji(): [UInt64];
-        // Return DuanjiView
         pub fun getDuanjiViewFrom(timestamp: UFix64): [DuanjiView];
+        // Return DuanjiView
         pub fun getAllDuanjiView(): [DuanjiView];
         pub fun getLatestDuanjiView(): DuanjiView?;
 
@@ -282,14 +279,18 @@ pub contract PunstersNFT: NonFungibleToken {
     pub struct DuanjiView {
         pub let id: UInt64;
         pub let owner: Address;
+        pub let description: String;
         pub let ipfsUrl: String;
         pub let funnyIndex: UInt32;
+        pub let isAD: Bool;
 
-        init(id: UInt64, owner: Address, ipfsUrl: String, fidx: UInt32) {
+        init(id: UInt64, owner: Address, description: String, ipfsUrl: String, fidx: UInt32, _ ad: Bool) {
             self.id = id;
             self.owner = owner;
+            self.description = description;
             self.ipfsUrl = ipfsUrl;
             self.funnyIndex = fidx;
+            self.isAD = ad;
         }
     }
 
@@ -329,6 +330,7 @@ pub contract PunstersNFT: NonFungibleToken {
         pub let followers: [Address];
 
         priv var duanjiUpdates: [DuanjiView];
+        priv var advertisement: [DuanjiView];
         priv var latestUpdate: UFix64;
 
         priv let commended: [UInt64];
@@ -353,6 +355,7 @@ pub contract PunstersNFT: NonFungibleToken {
             self.followers = [];
 
             self.duanjiUpdates = [];
+            self.advertisement = [];
             self.latestUpdate = self.timestamp;
 
             self.commended = [];
@@ -479,26 +482,7 @@ pub contract PunstersNFT: NonFungibleToken {
             return self.latestUpdate;
         }
 
-        // Get `Duanji` information
-        // Return informations of `Duanji` the time after `timestamp`
-        pub fun getDuanjiFrom(timestamp: UFix64): [UInt64]{
-            let duanjiKeys = self.ownedNFTs.keys;
-            var validKeys: [UInt64] = [];
-            for ele in duanjiKeys {
-                let nft = (&self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?)!
-                let temp = nft as! &PunstersNFT.NFT
-                if (temp.timestamp >= timestamp){
-                    validKeys.append(ele);
-                }
-            }
 
-            return validKeys;
-        }
-
-        // Return informations of all `Duanji`
-        pub fun getAllDuanji(): [UInt64]{
-            return self.ownedNFTs.keys
-        }
 
         pub fun getDuanjiViewFrom(timestamp: UFix64): [DuanjiView]{
             var outputViews: [DuanjiView] = [];
@@ -507,7 +491,8 @@ pub contract PunstersNFT: NonFungibleToken {
                 let temp = nft as! &PunstersNFT.NFT;
                 if (temp.timestamp > timestamp) {
                     if let url = temp.getURL() {
-                        outputViews.append(DuanjiView(id: ele, owner: self.acct, ipfsUrl: url, fidx: temp.getFunnyIndex()));
+                        outputViews.append(DuanjiView(id: ele, owner: self.acct, description: temp.metadata[PunstersNFT.descriptionKey]! as! String, 
+                                                        ipfsUrl: url, fidx: temp.getFunnyIndex(), false));
                     }
                 }
             }
@@ -522,7 +507,8 @@ pub contract PunstersNFT: NonFungibleToken {
                 let nft = (&self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?)!
                 let temp = nft as! &PunstersNFT.NFT;
                 if let url = temp.getURL() {
-                    outputViews.append(DuanjiView(id: ele, owner: self.acct, ipfsUrl: url, fidx: temp.getFunnyIndex()));
+                    outputViews.append(DuanjiView(id: ele, owner: self.acct, description: temp.metadata[PunstersNFT.descriptionKey]! as! String, 
+                                                    ipfsUrl: url, fidx: temp.getFunnyIndex(), false));
                 }
             }
 
@@ -535,7 +521,8 @@ pub contract PunstersNFT: NonFungibleToken {
                 let id = self.ownedNFTs.keys[lastKeyIndex]
                 if let nft = self.borrowDuanji(id: id) {
                     if let url = nft.getURL() {
-                        return DuanjiView(id: nft.id, owner: self.acct, ipfsUrl: url, fidx: nft.getFunnyIndex());
+                        return DuanjiView(id: nft.id, owner: self.acct, description: nft.metadata[PunstersNFT.descriptionKey]! as! String,
+                                            ipfsUrl: url, fidx: nft.getFunnyIndex(), false);
                     }
                 }
             }

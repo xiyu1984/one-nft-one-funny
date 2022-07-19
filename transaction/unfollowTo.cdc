@@ -1,5 +1,5 @@
-import PunstersNFT from 0x05ede3f803407aae
-import NonFungibleToken from 0x05ede3f803407aae
+import PunstersNFT from "../contracts/Punsters.cdc"
+import NonFungibleToken from "../contracts/NonFungibleToken.cdc"
 
 transaction (followingAddr: Address) {
     prepare (acct: AuthAccount) {
