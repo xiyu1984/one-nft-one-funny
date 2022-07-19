@@ -128,6 +128,10 @@ flow transactions send ./transaction/clearUpdates.cdc --signer <signer-account-i
 ```
 * Every following's update(publish new `duanji`) will be temporarily stored by his followers. But punsters can chose to clear this cache with this transaction.
 
+### [Destroy Punster](./transaction/destroyPunster.cdc)
+flow transactions send ./transaction/destroyPunster.cdc --signer testnet-account -n testnet
+* Destroy owned Punster. All of the owned `Duanji` and relationships will be cleared. But the commends to `Duanji`s will not be liquidated. 
+
 ## Scripts
 ### [query all 'duanji' from a Address](./scripts/queryDuanjiFrom.cdc)
 The related `Flow CLI` is as follow:
