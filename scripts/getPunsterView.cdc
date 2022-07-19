@@ -1,4 +1,4 @@
-import PunstersNFT from 0x05ede3f803407aae
+import PunstersNFT from "../contracts/Punsters.cdc"
 
 pub fun main(addr: Address): AnyStruct? {
     

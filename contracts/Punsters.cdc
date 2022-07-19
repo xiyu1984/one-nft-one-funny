@@ -1,5 +1,5 @@
-import MetadataViews from 0x05ede3f803407aae
-import NonFungibleToken from 0x05ede3f803407aae
+import MetadataViews from "./MetadataViews.cdc"
+import NonFungibleToken from "./NonFungibleToken.cdc"
 
 pub contract PunstersNFT: NonFungibleToken {
     // -----------------------------------------------------------------------
@@ -14,6 +14,8 @@ pub contract PunstersNFT: NonFungibleToken {
     // -----------------------------------------------------------------------
     // Punsters
     // -----------------------------------------------------------------------
+    pub event Destroy(info: String)
+
     pub let PunsterStoragePath: StoragePath;
     pub let IPunsterPublicPath: PublicPath;
     // pub let IFunnyIndexPublicPath: PublicPath;
@@ -173,8 +175,8 @@ pub contract PunstersNFT: NonFungibleToken {
         }
 
         access(contract) fun getFunnyIndex(): UInt32 {
-            let leftShiftBit: UInt64 = UInt64((getCurrentBlock().timestamp - self.timestamp) / self.halfLife); 
-            return UInt32(self.commends.length >> leftShiftBit);
+            let leftShiftBit: UInt64 = UInt64((getCurrentBlock().timestamp - self.timestamp) / PunstersNFT.halfLife); 
+            return UInt32(UInt64(self.commends.length) >> leftShiftBit);
         }
 
         pub fun getViews(): [Type] {
@@ -358,23 +360,26 @@ pub contract PunstersNFT: NonFungibleToken {
             self.isDestroy = false;
         }
 
-        destroy () {
+        pub fun preDestroy() {
             self.isDestroy = true;
-            destroy self.ownedNFTs;
 
             for ele in self.followings {
-                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
+                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: ele) {
                     punsterRef.destroyNotify(addr: self.acct);
                 }
             }
 
             for ele in self.followers {
-                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
+                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: ele) {
                     punsterRef.destroyNotify(addr: self.acct);
                 }
             }
 
             PunstersNFT.destroyPunsters(punsterID: self.id);
+        }
+
+        destroy () {
+            destroy self.ownedNFTs;
         }
 
         // -----------------------------------------------------------------------
@@ -638,8 +643,6 @@ pub contract PunstersNFT: NonFungibleToken {
         }
 
         pub fun getPunsterView(): PunstersNFT.PunsterView {
-            id: UInt64, owner: Address, description: String, ipfsUrl: String, funnyIndex: UInt32, followings: [Address], followers: [Address]
-
             return PunstersNFT.PunsterView(id: self.id, 
                                             owner: self.acct, 
                                             description: self.metadata[PunstersNFT.cidKey]! as! String,
@@ -651,8 +654,11 @@ pub contract PunstersNFT: NonFungibleToken {
         }
 
         pub fun destroyNotify(addr: Address) {
+            // emit Destroy(info: addr.toString().concat("before clear"));
+
             if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
-                if punsterRef.isDestroying() {
+                // emit Destroy(info: addr.toString().concat("in clear"));
+                if (punsterRef.isDestroying()) {
                     if let idx = self.followings.firstIndex(of: addr) {
                         self.followings.remove(at: idx);
                     }

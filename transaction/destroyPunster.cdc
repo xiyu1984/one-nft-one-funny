@@ -1,12 +1,16 @@
-import PunstersNFT from 0x05ede3f803407aae
-import NonFungibleToken from 0x05ede3f803407aae
+import PunstersNFT from "../contracts/Punsters.cdc"
+import NonFungibleToken from "../contracts/NonFungibleToken.cdc"
 
-transaction (description: String, ipfsURL: String) {
+transaction () {
 
   prepare(acct: AuthAccount) {
 
-    if let resPunster <- acct.load<PunstersNFT.Collection>(from: PunstersNFT.PunsterStoragePath) {
-        PunstersNFT.destroyPunsters(resPunster: resPunster);
+    if let punsterRef = acct.borrow<&PunstersNFT.Collection>(from : PunstersNFT.PunsterStoragePath) {
+        punsterRef.preDestroy();
+    }
+
+    if let resPunster <- acct.load<@PunstersNFT.Collection>(from: PunstersNFT.PunsterStoragePath) {
+        destroy resPunster;
     }
   }
 
