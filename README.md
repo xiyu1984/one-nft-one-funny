@@ -35,7 +35,7 @@ We can find some similar successful products in the Web2 world, such as Facebook
 (need a technical picture to explain)  
 The key points of the technology are as follows:  
 * `Following` mechanism can be implemented easily on Flow by resource interactions. 
-* `Funny index` evaluation algorithm in the `Commend` mechanism can make out an estimation of how funny a `Duanji` or a `Punster` is, which depends both on commend counts and time passed.
+* `Funny index` evaluation algorithm in the `Commend` mechanism can make out an estimation of how funny a `Duanji` or a `Punster` is, which depends both on commending counts and time passed.
 * Advertisement mechanism based on `funny index` of `Punsters`.
 * A cross-chain trading market system.
 
