@@ -1,4 +1,10 @@
 # ------------------------------------------------------------------------
+# deploy project
+flow project deploy -n testnet --update
+
+# transfer Flow Token
+flow transactions send ./transaction/test/transferFlow.cdc 100.0 0x01cf0e2f2f715450
+
 # acctonts and contracts
 
 flow accounts get 0x05ede3f803407aae -n testnet
@@ -17,22 +23,27 @@ flow transactions send ./transaction/remove.cdc --signer testnet-account -n test
 # ------------------------------------------------------------------------
 # transactions
 # Register `Punster`
-flow transactions send ./transaction/RegisterPunster.cdc "I'm a funny punster!" "Punster Alice's ipfs url" --signer testnet-Alice -n testnet
+flow transactions send ./transaction/registerPunster.cdc "I'm a funny punster!" "Punster Alice's ipfs url" --signer testnet-Alice -n testnet
 
 # Publish `Duanji`
-flow transactions send ./transaction/PublishDuanji.cdc "I found the dog is so funny!" "ipfs uri 2 is defined" --signer testnet-account -n testnet
+flow transactions send ./transaction/publishDuanji.cdc "I found the dog is so funny!" "ipfs uri 2 is defined" --signer testnet-account -n testnet
 
 # Commend to `Duanji`
-flow transactions send ./transaction/CommendTo.cdc 0x05ede3f803407aae 3 --signer testnet-account -n testnet
+flow transactions send ./transaction/commendTo.cdc 0x05ede3f803407aae 3 --signer testnet-account -n testnet
+
+--signer emulator-Alice
 
 # Cancel commend to `Duanji`
-flow transactions send ./transaction/CancelCommendTo.cdc 0x05ede3f803407aae 3 --signer testnet-Alice -n testnet
+flow transactions send ./transaction/cancelCommendTo.cdc 0x05ede3f803407aae 3 --signer testnet-Alice -n testnet
 
 # Follow to someone
 flow transactions send ./transaction/followTo.cdc 0x05ede3f803407aae --signer testnet-account -n testnet
 
 # Unfollow to someone
 flow transactions send ./transaction/unfollowTo.cdc 0x05ede3f803407aae --signer testnet-account -n testnet
+
+# Post ads.
+flow transactions send ./transaction/postADs.cdc "This is an Alice's ad." "Alice's ipfs URL." --sginer testnet-Alice -n testnet
 
 # Clear following updates
 flow transactions send ./transaction/clearUpdates.cdc --signer testnet-account -n testnet
@@ -61,15 +72,21 @@ flow scripts execute ./scripts/getFollowings.cdc 0x33a8abe2196c9e15 -n testnet
 # query following duanji updates
 flow scripts execute ./scripts/getFollowingUpdates.cdc 0x33a8abe2196c9e15 -n testnet
 
+# query all following duanji
+flow scripts execute ./scripts/getAllDuanjiFollowing.cdc 0x33a8abe2196c9e15 -n testnet
+
 # query all punsters
 flow scripts execute ./scripts/queryAllPunsters.cdc -n testnet
 
 # query punster view
-flow scripts execute ./scripts/getPunsterView.cdc 0x05ede3f803407aae -n testnet
+flow scripts execute ./scripts/getPunsterView.cdc 0x01cf0e2f2f715450 -n testnet
 
 
 # ------------------------------------------------------------------------
 # For test
 # Register and publish one
 flow transactions send ./transaction/test/RegisterAndPublish.cdc --signer testnet-account -n testnet
+
+# Test advertisement mechanism
+flow scripts execute ./scripts/test/AdBoxTest.cdc
 

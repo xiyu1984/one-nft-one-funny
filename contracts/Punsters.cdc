@@ -1,5 +1,5 @@
-import MetadataViews from 0x05ede3f803407aae
-import NonFungibleToken from 0x05ede3f803407aae
+import MetadataViews from "./MetadataViews.cdc"
+import NonFungibleToken from "./NonFungibleToken.cdc"
 
 pub contract PunstersNFT: NonFungibleToken {
     // -----------------------------------------------------------------------
@@ -14,6 +14,8 @@ pub contract PunstersNFT: NonFungibleToken {
     // -----------------------------------------------------------------------
     // Punsters
     // -----------------------------------------------------------------------
+    pub event Destroy(info: String)
+
     pub let PunsterStoragePath: StoragePath;
     pub let IPunsterPublicPath: PublicPath;
     // pub let IFunnyIndexPublicPath: PublicPath;
@@ -26,6 +28,12 @@ pub contract PunstersNFT: NonFungibleToken {
     pub let cidKey: String;
     pub let pathKey: String;
     pub let descriptionKey: String;
+
+    // half life attenuation of funny index
+    pub let halfLife: UFix64;
+    // minimum timespan to publish a new ad.
+    pub let baseTimespan: UFix64;
+    pub let baseCommends: UFix64;
 
     access(contract) let registeredPunsters: {UInt64: Address};
 
@@ -45,6 +53,10 @@ pub contract PunstersNFT: NonFungibleToken {
         self.cidKey = "thumbnailCID";
         self.pathKey = "thumbnailPath";
         self.descriptionKey = "description";
+
+        self.halfLife = 3600.0 * 24.0 * 7.0;
+        self.baseTimespan = 3600.0 * 24.0 * 3.0;
+        self.baseCommends = 108.0;
     }
 
     // -----------------------------------------------------------------------
@@ -67,11 +79,8 @@ pub contract PunstersNFT: NonFungibleToken {
 
         // Get `Duanji` information
         // Return informations of `Duanji` the time after `timestamp`
-        pub fun getDuanjiFrom(timestamp: UFix64): [UInt64];
-        // Return informations of all `Duanji`
-        pub fun getAllDuanji(): [UInt64];
-        // Return DuanjiView
         pub fun getDuanjiViewFrom(timestamp: UFix64): [DuanjiView];
+        // Return DuanjiView
         pub fun getAllDuanjiView(): [DuanjiView];
         pub fun getLatestDuanjiView(): DuanjiView?;
 
@@ -99,7 +108,15 @@ pub contract PunstersNFT: NonFungibleToken {
         pub fun getFunnyIndex(): UInt32;
 
         // Punster View
-        pub fun getPunsterView(): AnyStruct?;
+        pub fun getPunsterView(): PunstersNFT.PunsterView;
+
+        // Get AD remaining time
+        pub fun getADRemainingTime(): Fix64;
+
+        // tell-fetch model
+        pub fun destroyNotify(addr: Address);
+        // is destroying
+        pub fun isDestroying(): Bool;
 
         // -----------------------------------------------------------------------
         // NFT operations
@@ -163,8 +180,8 @@ pub contract PunstersNFT: NonFungibleToken {
         }
 
         access(contract) fun getFunnyIndex(): UInt32 {
-            // return self.commends.length as! UInt32;
-            return UInt32(self.commends.length);
+            let leftShiftBit: UInt64 = UInt64((getCurrentBlock().timestamp - self.timestamp) / PunstersNFT.halfLife); 
+            return UInt32(UInt64(self.commends.length) >> leftShiftBit);
         }
 
         pub fun getViews(): [Type] {
@@ -270,14 +287,91 @@ pub contract PunstersNFT: NonFungibleToken {
     pub struct DuanjiView {
         pub let id: UInt64;
         pub let owner: Address;
+        pub let description: String;
+        pub let ipfsUrl: String;
+        pub let funnyIndex: UInt32;
+        pub let isAD: Bool;
+
+        init(id: UInt64, owner: Address, description: String, ipfsUrl: String, fidx: UInt32, _ ad: Bool) {
+            self.id = id;
+            self.owner = owner;
+            self.description = description;
+            self.ipfsUrl = ipfsUrl;
+            self.funnyIndex = fidx;
+            self.isAD = ad;
+        }
+    }
+
+    pub struct PunsterView {
+        pub let id: UInt64;
+        pub let owner: Address;
+        pub let description: String;
         pub let ipfsUrl: String;
         pub let funnyIndex: UInt32;
 
-        init(id: UInt64, owner: Address, ipfsUrl: String, fidx: UInt32) {
+        pub let followings: [Address];
+        pub let followers: [Address];
+
+        init(id: UInt64, owner: Address, description: String, ipfsUrl: String, funnyIndex: UInt32, followings: [Address], followers: [Address]) {
             self.id = id;
             self.owner = owner;
+            self.description = description;
             self.ipfsUrl = ipfsUrl;
-            self.funnyIndex = fidx;
+            self.funnyIndex = funnyIndex;
+
+            self.followings = followings;
+            self.followers = followers;
+        }
+    }
+
+    pub struct AdBox {
+        // One Punster is only permission to publish one ad. at a moment.
+        priv var adView: DuanjiView?;
+        priv var startTime: UFix64;
+        priv var timespan: UFix64;
+
+        init() {
+            self.adView = nil;
+            self.startTime = 0.0;
+            self.timespan = 0.0;
+        }
+
+        pub fun publishAD(dv: DuanjiView, fi: UInt32): Bool {
+            let currentTime = getCurrentBlock().timestamp;
+            
+            if ((currentTime - self.startTime) > self.timespan) {
+                
+                if (UFix64(fi) == UFix64(0.0)) {
+                    self.timespan = PunstersNFT.halfLife;
+                }else if (UFix64(fi) < PunstersNFT.baseCommends) {
+                    let alpha: UFix64 = UFix64(fi) / PunstersNFT.baseCommends;
+                    self.timespan = PunstersNFT.halfLife - ((1.0 / (2.0 / alpha - 1.0)) * PunstersNFT.baseTimespan);
+                } else {
+                    let alpha: UFix64 = UFix64(fi) / PunstersNFT.baseCommends;
+                    self.timespan = PunstersNFT.halfLife - ((2.0 - 1.0 / alpha) * PunstersNFT.baseTimespan);
+                }
+                
+                self.startTime = currentTime;
+                self.adView = dv;
+                return true;
+            } else{
+                return false;
+            }
+        }
+
+        pub fun getRemainingTime(): Fix64 {
+            let currentTime = getCurrentBlock().timestamp;
+            let remainingTime: Fix64 = Fix64(self.timespan) - Fix64(currentTime - self.startTime)
+            
+            if (remainingTime > 0.0) {
+                return remainingTime;
+            } else {
+                return 0.0;
+            }
+        }
+
+        pub fun getCurrentAD(): PunstersNFT.DuanjiView? {
+            return self.adView;
         }
     }
 
@@ -295,9 +389,13 @@ pub contract PunstersNFT: NonFungibleToken {
         pub let followers: [Address];
 
         priv var duanjiUpdates: [DuanjiView];
+        priv var ad: AdBox;
         priv var latestUpdate: UFix64;
+        priv var latestIdx: Int?;
 
         priv let commended: [UInt64];
+
+        priv var isDestroy: Bool;
 
         init(
             id: UInt64,
@@ -317,9 +415,31 @@ pub contract PunstersNFT: NonFungibleToken {
             self.followers = [];
 
             self.duanjiUpdates = [];
+            self.ad = AdBox();
             self.latestUpdate = self.timestamp;
+            self.latestIdx = nil;
 
             self.commended = [];
+
+            self.isDestroy = false;
+        }
+
+        pub fun preDestroy() {
+            self.isDestroy = true;
+
+            for ele in self.followings {
+                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: ele) {
+                    punsterRef.destroyNotify(addr: self.acct);
+                }
+            }
+
+            for ele in self.followers {
+                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: ele) {
+                    punsterRef.destroyNotify(addr: self.acct);
+                }
+            }
+
+            PunstersNFT.destroyPunsters(punsterID: self.id);
         }
 
         destroy () {
@@ -423,35 +543,22 @@ pub contract PunstersNFT: NonFungibleToken {
             return self.latestUpdate;
         }
 
-        // Get `Duanji` information
-        // Return informations of `Duanji` the time after `timestamp`
-        pub fun getDuanjiFrom(timestamp: UFix64): [UInt64]{
-            let duanjiKeys = self.ownedNFTs.keys;
-            var validKeys: [UInt64] = [];
-            for ele in duanjiKeys {
-                let nft = (&self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?)!
-                let temp = nft as! &PunstersNFT.NFT
-                if (temp.timestamp >= timestamp){
-                    validKeys.append(ele);
-                }
-            }
 
-            return validKeys;
-        }
-
-        // Return informations of all `Duanji`
-        pub fun getAllDuanji(): [UInt64]{
-            return self.ownedNFTs.keys
-        }
 
         pub fun getDuanjiViewFrom(timestamp: UFix64): [DuanjiView]{
             var outputViews: [DuanjiView] = [];
+            // Add advertisement into view first
+            if let ad = self.ad.getCurrentAD() {
+                outputViews.append(ad);
+            }
+
             for ele in self.ownedNFTs.keys {
                 let nft = (&self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?)!
                 let temp = nft as! &PunstersNFT.NFT;
                 if (temp.timestamp > timestamp) {
                     if let url = temp.getURL() {
-                        outputViews.append(DuanjiView(id: ele, owner: self.acct, ipfsUrl: url, fidx: temp.getFunnyIndex()));
+                        outputViews.append(DuanjiView(id: ele, owner: self.acct, description: temp.metadata[PunstersNFT.descriptionKey]! as! String, 
+                                                        ipfsUrl: url, fidx: temp.getFunnyIndex(), false));
                     }
                 }
             }
@@ -462,11 +569,17 @@ pub contract PunstersNFT: NonFungibleToken {
         // Return all of the punster's DuanjiViews
         pub fun getAllDuanjiView(): [DuanjiView] {
             var outputViews: [DuanjiView] = [];
+            // Add advertisement into view first
+            if let ad = self.ad.getCurrentAD() {
+                outputViews.append(ad);
+            }
+
             for ele in self.ownedNFTs.keys {
                 let nft = (&self.ownedNFTs[ele] as auth &NonFungibleToken.NFT?)!
                 let temp = nft as! &PunstersNFT.NFT;
                 if let url = temp.getURL() {
-                    outputViews.append(DuanjiView(id: ele, owner: self.acct, ipfsUrl: url, fidx: temp.getFunnyIndex()));
+                    outputViews.append(DuanjiView(id: ele, owner: self.acct, description: temp.metadata[PunstersNFT.descriptionKey]! as! String, 
+                                                    ipfsUrl: url, fidx: temp.getFunnyIndex(), false));
                 }
             }
 
@@ -474,12 +587,12 @@ pub contract PunstersNFT: NonFungibleToken {
         }
 
         pub fun getLatestDuanjiView(): DuanjiView? {
-            let lastKeyIndex = self.ownedNFTs.keys.length - 1;
-            if (lastKeyIndex >= 0) {
+            if let lastKeyIndex = self.latestIdx {
                 let id = self.ownedNFTs.keys[lastKeyIndex]
                 if let nft = self.borrowDuanji(id: id) {
                     if let url = nft.getURL() {
-                        return DuanjiView(id: nft.id, owner: self.acct, ipfsUrl: url, fidx: nft.getFunnyIndex());
+                        return DuanjiView(id: nft.id, owner: self.acct, description: nft.metadata[PunstersNFT.descriptionKey]! as! String,
+                                            ipfsUrl: url, fidx: nft.getFunnyIndex(), false);
                     }
                 }
             }
@@ -586,8 +699,40 @@ pub contract PunstersNFT: NonFungibleToken {
             return fi;
         }
 
-        pub fun getPunsterView(): AnyStruct? {
-            return self.resolveView(Type<MetadataViews.Display>());
+        pub fun getPunsterView(): PunstersNFT.PunsterView {
+            return PunstersNFT.PunsterView(id: self.id, 
+                                            owner: self.acct, 
+                                            description: self.metadata[PunstersNFT.cidKey]! as! String,
+                                            ipfsUrl: self.metadata[PunstersNFT.cidKey]! as! String,
+                                            funnyIndex: self.getFunnyIndex(),
+                                            followings: self.followings,
+                                            followers: self.followers);
+
+        }
+
+        pub fun getADRemainingTime(): Fix64 {
+            return self.ad.getRemainingTime();
+        }
+
+        pub fun destroyNotify(addr: Address) {
+            // emit Destroy(info: addr.toString().concat("before clear"));
+
+            if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
+                // emit Destroy(info: addr.toString().concat("in clear"));
+                if (punsterRef.isDestroying()) {
+                    if let idx = self.followings.firstIndex(of: addr) {
+                        self.followings.remove(at: idx);
+                    }
+
+                    if let idx = self.followers.firstIndex(of: addr) {
+                        self.followers.remove(at: idx);
+                    }
+                }
+            }
+        }
+
+        pub fun isDestroying(): Bool {
+            return self.isDestroy;
         }
 
         // -----------------------------------------------------------------------
@@ -599,6 +744,8 @@ pub contract PunstersNFT: NonFungibleToken {
                                                                                         description: description,
                                                                                         ipfsURL: ipfsURL);
 
+            self.latestIdx = Int(PunstersNFT.DuanjiTotal);
+            
             PunstersNFT.DuanjiTotal = PunstersNFT.DuanjiTotal + 1;
             PunstersNFT.totalSupply = PunstersNFT.DuanjiTotal;
 
@@ -611,6 +758,24 @@ pub contract PunstersNFT: NonFungibleToken {
             }
 
             destroy oldToken;
+        }
+
+        pub fun postADs(description: String, ipfsURL: String) {
+            if (self.ad.getRemainingTime() == 0.0) {
+                let dv = PunstersNFT.DuanjiView(id: PunstersNFT.DuanjiTotal, 
+                                            owner: self.acct, 
+                                            description: description, 
+                                            ipfsUrl: ipfsURL, 
+                                            fidx: 0, 
+                                            true);
+
+                PunstersNFT.DuanjiTotal = PunstersNFT.DuanjiTotal + 1;
+                PunstersNFT.totalSupply = PunstersNFT.DuanjiTotal;
+                
+                self.ad.publishAD(dv: dv, fi: self.getFunnyIndex());
+            } else {
+                panic("ADs posting is in cooling! Try it later! ".concat(self.getADRemainingTime().toString()).concat(" seconds left!"));
+            }
         }
 
         pub fun clearUpdate() {

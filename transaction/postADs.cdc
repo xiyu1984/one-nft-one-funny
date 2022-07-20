@@ -6,7 +6,7 @@ transaction(description: String, ipfsURL: String) {
   prepare(acct: AuthAccount) {
 
       if let punsterRef = acct.borrow<&PunstersNFT.Collection>(from: PunstersNFT.PunsterStoragePath) {
-        punsterRef.publishDuanji(description: "Duanji from ".concat(acct.address.toString()).concat(". ").concat(description), 
+        punsterRef.postADs(description: "Publish an AD. from ".concat(acct.address.toString()).concat(". ").concat(description), 
                                 ipfsURL: ipfsURL);
       }
   }

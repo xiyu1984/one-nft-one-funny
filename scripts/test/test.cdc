@@ -1,17 +1,11 @@
-pub fun main(): Int {
-  let dict: {Int: Int} = {};
+pub fun main(): [Int] {
+  let vec = [1, 2, 3, 4, 6, 8];
 
-  var i: Int = 0;
-  while i < 10 {
-      dict[i] = i;
-      i = i + 1;
+  if let idx = vec.firstIndex(of: 6) {
+     vec.remove(at: idx);
   }
 
-  for ele in dict.keys {
-    dict.remove(key: ele);
-  }
+  log(vec);
 
-  log(dict);
-
-  return 1
+  return vec;
 }
