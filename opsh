@@ -31,6 +31,8 @@ flow transactions send ./transaction/publishDuanji.cdc "I found the dog is so fu
 # Commend to `Duanji`
 flow transactions send ./transaction/commendTo.cdc 0x05ede3f803407aae 3 --signer testnet-account -n testnet
 
+--signer emulator-Alice
+
 # Cancel commend to `Duanji`
 flow transactions send ./transaction/cancelCommendTo.cdc 0x05ede3f803407aae 3 --signer testnet-Alice -n testnet
 
@@ -39,6 +41,9 @@ flow transactions send ./transaction/followTo.cdc 0x05ede3f803407aae --signer te
 
 # Unfollow to someone
 flow transactions send ./transaction/unfollowTo.cdc 0x05ede3f803407aae --signer testnet-account -n testnet
+
+# Post ads.
+flow transactions send ./transaction/postADs.cdc "This is an Alice's ad." "Alice's ipfs URL." --sginer testnet-Alice -n testnet
 
 # Clear following updates
 flow transactions send ./transaction/clearUpdates.cdc --signer testnet-account -n testnet
@@ -66,6 +71,9 @@ flow scripts execute ./scripts/getFollowings.cdc 0x33a8abe2196c9e15 -n testnet
 
 # query following duanji updates
 flow scripts execute ./scripts/getFollowingUpdates.cdc 0x33a8abe2196c9e15 -n testnet
+
+# query all following duanji
+flow scripts execute ./scripts/getAllDuanjiFollowing.cdc 0x33a8abe2196c9e15 -n testnet
 
 # query all punsters
 flow scripts execute ./scripts/queryAllPunsters.cdc -n testnet

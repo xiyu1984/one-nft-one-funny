@@ -1,6 +1,6 @@
 # PunStar
 # Introduction
-PunStar is a social platform based on funny. punStar participants are called "Punsters" (an NFT) and they can share their funny things in the form of "Duanji" (an NFT). Each person can express their preference for a "Duanji", which can stimulate the construction of social relationships between participants. In addition, we have created advertising mechanisms to demonstrate the interesting executable capabilities based on Flow's unique resource mechanism, which will be a great improvement for NFTs.
+PunStar is a social platform based on funny. punStar participants are called "Punsters" (an NFT) and they can share their funny things in the form of "Duanji" (an NFT). Each person can express their preference for a "Duanji", which can stimulate the construction of social relationships between participants and let it possible to estimate the "funny index" of each "Punster". The "Punsters" can make content promotions(e.g. publish ads) based on their relationship constructed in PunStar, which needs to satisfy some restrictions based on the "funny index" first. We use Flow's unique mechanism to coalesce social relationships, content promotion, and some other practical abilities into NFT, which is a great enhancement to the existing NFT, allowing NFT to be more realistic and of greater practical value.
 
 ## Highlights
 * **Assetization of social relationships**  
@@ -9,7 +9,7 @@ As we know, in resource-oriented cadence things can be bound to each resource, s
 * **Assetization of funny things** 
 As every participant can express their preference for a `Dunaji`, the funny index of a `Duanji` and `Punsters` can be evaluated, which may improve their market performance.
 
-* **Advertisement mechanism: one of the special executable abilities of NFT on Flow**   
+* **Enable and assetize execution abilities for NFT: Such as advertisement mechanism**   
 `Punsters` can push advertisements to their followers with limitations of some conditions based on the `funny index` mechanism. This is a demonstration of a specific feature of Flow's NFT, which is the implementation of executable abilities bound to NFTs. 
 
 * Assets in PunStar can be accessed cross-chain  
