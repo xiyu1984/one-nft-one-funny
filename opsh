@@ -87,3 +87,6 @@ flow scripts execute ./scripts/getPunsterView.cdc 0x01cf0e2f2f715450 -n testnet
 # Register and publish one
 flow transactions send ./transaction/test/RegisterAndPublish.cdc --signer testnet-account -n testnet
 
+# Test advertisement mechanism
+flow scripts execute ./scripts/test/AdBoxTest.cdc
+
