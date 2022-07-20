@@ -121,6 +121,14 @@ flow transactions send ./transaction/unfollowTo.cdc 0x05ede3f803407aae --signer 
 ```
 * * The first parameter `0x05ede3f803407aae` is the account to unfollow
 
+### Post ads.
+The related `Flow CLI` is as follow:
+```sh
+flow transactions send ./transaction/postADs.cdc "This is an Alice's ad." "Alice's ipfs URL." --sginer testnet-Alice -n testnet
+```
+* The first parameter `This is an Alice's ad.` is the description of the ad.
+* The second parameter `Alice's ipfs URL.` is the IPFS url, the same as normal `Duanji`.
+
 ### [Clear following updates](./transaction/clearUpdates.cdc)
 The related `Flow CLI` is as follow:
 ```sh

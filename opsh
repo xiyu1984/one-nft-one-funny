@@ -90,3 +90,6 @@ flow transactions send ./transaction/test/RegisterAndPublish.cdc --signer testne
 # Test advertisement mechanism
 flow scripts execute ./scripts/test/AdBoxTest.cdc
 
+# Test StarRealm
+flow scripts execute ./scripts/test/StarRealmTest.cdc
+
