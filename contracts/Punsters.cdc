@@ -529,13 +529,13 @@ pub contract PunstersNFT: NonFungibleToken {
         // tell-fetch model. 
         // Notify followers to 
         pub fun notify(addr: Address) {
-            if (self.followings.contains(addr)) {
-                if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
-                    if let dv = punsterRef.getLatestDuanjiView() {
-                        self.duanjiUpdates.append(dv);
-                    }
-                }
-            }
+            // if (self.followings.contains(addr)) {
+            //     if let punsterRef = PunstersNFT.getIPunsterFromAddress(addr: addr) {
+            //         if let dv = punsterRef.getLatestDuanjiView() {
+            //             self.duanjiUpdates.append(dv);
+            //         }
+            //     }
+            // }
         }
 
         // return last update timestamp, that is `fun getCurrentBlock(): Block`

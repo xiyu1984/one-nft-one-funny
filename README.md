@@ -72,7 +72,7 @@ The key points of the technology are as follows:
 The transactions and scripts to invoke resource operations and query resource statements are as follows:
 
 ## Transactions
-The deployed address on Testnet is: *0x05ede3f803407aae* 
+The deployed address on Testnet is: *0xd77db11694592a2b* 
 
 ### [Register `Punster`](./transaction/registerPunster.cdc)
 The related `Flow CLI` is as follow: 
@@ -137,10 +137,19 @@ flow transactions send ./transaction/clearUpdates.cdc --signer <signer-account-i
 * Every following's update(publish new `duanji`) will be temporarily stored by his followers. But punsters can chose to clear this cache with this transaction.
 
 ### [Destroy Punster](./transaction/destroyPunster.cdc)
+The related `Flow CLI` is as follow:
+```sh
 flow transactions send ./transaction/destroyPunster.cdc --signer testnet-account -n testnet
+```
 * Destroy owned Punster. All of the owned `Duanji` and relationships will be cleared. But the commends to `Duanji`s will not be liquidated. 
 
 ## Scripts
+### query all following duanji
+```sh
+flow scripts execute ./scripts/getAllDuanjiFollowing.cdc 0x33a8abe2196c9e15 -n testnet
+```
+* Returns all the `Duanji` the punster with the address `0x33a8abe2196c9e15` following. 
+
 ### [query all 'duanji' from a Address](./scripts/queryDuanjiFrom.cdc)
 The related `Flow CLI` is as follow:
 ```sh
