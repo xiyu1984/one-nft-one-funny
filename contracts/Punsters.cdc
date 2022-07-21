@@ -38,8 +38,8 @@ pub contract PunstersNFT: NonFungibleToken {
     access(contract) let registeredPunsters: {UInt64: Address};
 
     init() {
-        self.PunsterStoragePath = /storage/PunsterStoragePath;
-        self.IPunsterPublicPath = /public/IPunsterPublicPath;
+        self.PunsterStoragePath = StoragePath(identifier: "PunsterStoragePath".concat(self.account.address.toString()))!;
+        self.IPunsterPublicPath = PublicPath(identifier: "IPunsterPublicPath".concat(self.account.address.toString()))!;
         // self.IFunnyIndexPublicPath = /public/IFunnyIndexPublicPath;
         // self.DuanjiStoragePath = /storage/DuanjiStoragePath;
         // self.IDuanjiPublicPath = /public/IDuanjiPublicPath;
