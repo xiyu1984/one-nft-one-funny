@@ -1,18 +1,21 @@
 import NonFungibleToken from "./NonFungibleToken.cdc"
 
 pub contract StarRealm {
+    // -----------------------------------------------------------------------
+    // StarDocker API, used for locker
+    // -----------------------------------------------------------------------
     pub resource interface StarDocker {
-        pub fun docking(punster: @NonFungibleToken.Collection);
+        pub fun docking(nft: @AnyResource{NonFungibleToken.INFT});
     }
 
     pub resource StarPort: StarDocker {
-        priv var punster: @NonFungibleToken.Collection?;
+        priv var punster: @AnyResource{NonFungibleToken.INFT}?;
 
         init() {
             self.punster <- nil;
         }
 
-        pub fun sailing(): @NonFungibleToken.Collection? {
+        pub fun sailing(): @AnyResource{NonFungibleToken.INFT}? {
             if let punsterRes <- self.punster <- nil {
                 return <- punsterRes;
             } else {
@@ -20,13 +23,16 @@ pub contract StarRealm {
             }
         }
 
-        pub fun docking(punster: @NonFungibleToken.Collection) {
+        // -----------------------------------------------------------------------
+        // StarDocker API, used for locker
+        // -----------------------------------------------------------------------
+        pub fun docking(nft: @AnyResource{NonFungibleToken.INFT}) {
             // if let oldpunster <- self.punster <- punster {
             //     destroy oldpunster
             // } else {
             //     self.punster <-! punster;
             // }
-            let oldpunster <- self.punster <- punster;
+            let oldpunster <- self.punster <- nft;
             destroy oldpunster;
         }
 
