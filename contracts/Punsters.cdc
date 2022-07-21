@@ -184,6 +184,10 @@ pub contract PunstersNFT: NonFungibleToken {
             return UInt32(UInt64(self.commends.length) >> leftShiftBit);
         }
 
+        access(contract) fun getCommendAddress(): [Address] {
+            return self.commends;
+        }
+
         pub fun getViews(): [Type] {
             return [
                 Type<MetadataViews.Display>(),
@@ -292,12 +296,16 @@ pub contract PunstersNFT: NonFungibleToken {
         pub let funnyIndex: UInt32;
         pub let isAD: Bool;
 
-        init(id: UInt64, owner: Address, description: String, ipfsUrl: String, fidx: UInt32, _ ad: Bool) {
+        pub let commends: [Address];
+
+        init(id: UInt64, owner: Address, description: String, ipfsUrl: String, fidx: UInt32, commends: [Address], _ ad: Bool) {
             self.id = id;
             self.owner = owner;
             self.description = description;
             self.ipfsUrl = ipfsUrl;
             self.funnyIndex = fidx;
+            self.commends = commends;
+
             self.isAD = ad;
         }
     }
@@ -558,7 +566,7 @@ pub contract PunstersNFT: NonFungibleToken {
                 if (temp.timestamp > timestamp) {
                     if let url = temp.getURL() {
                         outputViews.append(DuanjiView(id: ele, owner: self.owner!.address, description: temp.metadata[PunstersNFT.descriptionKey]! as! String, 
-                                                        ipfsUrl: url, fidx: temp.getFunnyIndex(), false));
+                                                        ipfsUrl: url, fidx: temp.getFunnyIndex(), commends: temp.getCommendAddress(), false));
                     }
                 }
             }
@@ -579,7 +587,7 @@ pub contract PunstersNFT: NonFungibleToken {
                 let temp = nft as! &PunstersNFT.NFT;
                 if let url = temp.getURL() {
                     outputViews.append(DuanjiView(id: ele, owner: self.owner!.address, description: temp.metadata[PunstersNFT.descriptionKey]! as! String, 
-                                                    ipfsUrl: url, fidx: temp.getFunnyIndex(), false));
+                                                    ipfsUrl: url, fidx: temp.getFunnyIndex(), commends: temp.getCommendAddress(), false));
                 }
             }
 
@@ -592,7 +600,7 @@ pub contract PunstersNFT: NonFungibleToken {
                 if let nft = self.borrowDuanji(id: id) {
                     if let url = nft.getURL() {
                         return DuanjiView(id: nft.id, owner: self.owner!.address, description: nft.metadata[PunstersNFT.descriptionKey]! as! String,
-                                            ipfsUrl: url, fidx: nft.getFunnyIndex(), false);
+                                            ipfsUrl: url, fidx: nft.getFunnyIndex(), commends: nft.getCommendAddress(), false);
                     }
                 }
             }
@@ -767,6 +775,7 @@ pub contract PunstersNFT: NonFungibleToken {
                                             description: description, 
                                             ipfsUrl: ipfsURL, 
                                             fidx: 0, 
+                                            commends: [],
                                             true);
 
                 PunstersNFT.DuanjiTotal = PunstersNFT.DuanjiTotal + 1;
