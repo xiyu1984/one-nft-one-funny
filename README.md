@@ -72,7 +72,7 @@ The key points of the technology are as follows:
 The transactions and scripts to invoke resource operations and query resource statements are as follows:
 
 ## Transactions
-The deployed address on Testnet is: *0xd77db11694592a2b* 
+The deployed address on Testnet is: *0xa75346d2c919b743* 
 
 ### [Register `Punster`](./transaction/registerPunster.cdc)
 The related `Flow CLI` is as follow: 
