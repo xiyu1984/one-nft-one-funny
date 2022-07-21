@@ -23,7 +23,7 @@ flow transactions send ./transaction/remove.cdc --signer testnet-account -n test
 # ------------------------------------------------------------------------
 # transactions
 # Register `Punster`
-flow transactions send ./transaction/registerPunster.cdc "I'm a funny punster!" "Punster Alice's ipfs url" --signer testnet-Alice -n testnet
+flow transactions send ./transaction/registerPunster.cdc "I'm punster Alice!" "Punster Alice's ipfs url" --signer testnet-Alice -n testnet
 
 # Publish `Duanji`
 flow transactions send ./transaction/publishDuanji.cdc "I found the dog is so funny!" "ipfs uri 2 is defined" --signer testnet-account -n testnet
@@ -93,3 +93,7 @@ flow scripts execute ./scripts/test/AdBoxTest.cdc
 # Test StarRealm
 flow scripts execute ./scripts/test/StarRealmTest.cdc
 
+# ------------------------------------------------------------------------
+# Environment
+# Clear the data of resources related to contracts deployed by other accounts
+flow transactions send ./transaction/env/clearDataBefore.cdc --signer testnet-Alice -n testnet
