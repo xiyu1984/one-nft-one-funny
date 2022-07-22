@@ -1,0 +1,78 @@
+{
+	"emulators": {
+		"default": {
+			"port": 3569,
+			"serviceAccount": "emulator-account"
+		}
+	},
+	"contracts": {
+		"FungibleToken": "./contracts/utility/FungibleToken.cdc",
+		"NonFungibleToken": "./contracts/NonFungibleToken.cdc",
+		"MetadataViews": "./contracts/MetadataViews.cdc",
+		"PunstersNFT": "./contracts/Punsters.cdc",
+		"StarRealm": "./contracts/StarRealm.cdc"
+	},
+	"networks": {
+		"emulator": "127.0.0.1:3569",
+		"mainnet": "access.mainnet.nodes.onflow.org:9000",
+		"testnet": "access.devnet.nodes.onflow.org:9000"
+	},
+	"accounts": {
+		"emulator-account": {
+			"address": "f8d6e0586b0a20c7",
+			"Public Key": "b0868617d903cd9abf71c21d48d03665791fe7b3145443fe07efce04ea841ee9e19909b97cd982bba5556f45fdd856c7c344017b9dbb0ec6de3d779963a195fc",
+			"key": "a0410f663e920c4a1331fdfefde062c260f82329543c382abbc63cc1fde3ae73"
+		},
+		"emulator-Alice": {
+			"address": "0x01cf0e2f2f715450",
+			"key": "5546540bc17887e5c9d490bb756faa2535269a41e956242d30db4d137fe034ef"
+		},
+		"testnet-account" : {
+			"address": "0x33a8abe2196c9e15",
+			"key": "a92f430fbc5ecdbe934b53be845435deeff12c9b4cf32cf255d6ba8d91058d69"
+		},
+		"testnet-subone" : {
+			"address": "0xd77db11694592a2b",
+			"key": "4b383a4cb339cc79f77b5a06fba1012944b041c2956146e737d76293ce2783bd"
+		},
+		"testnet-subtwo" : {
+			"address": "0xa75346d2c919b743",
+			"key": "b791e604857282cf4c9814131ee6710981c217b48af826ad088db690b454490b"
+		},
+		"testnet-Alice" : {
+			"address": "0x05ede3f803407aae",
+			"Public Key": "4ac9795f2a91f84b64d35eedbd482e729a32fdc9743ff39f9716b04d42df820cd1d8e0433f07d0adcf577a82f666f09624a7e1d45524247bafeb28152ea3f2cf",
+			"key": "652563200c22afa575fba28149d3170184a9c64e66888e59ae7595779c72e66c"
+		},
+		"testnet-Bob" : {
+			"address": "0x1a478a7149935b63",
+			"Public Key": "df0118a59d779d2a0e6b056e62ede00485152aa1f33068092aadf3deb3f538d88920d0c8f500e9bc643a3de12ce3659a54961d11ade93717523cc9112a582a40",
+			"key": "2da6119819ed8f2a74a4fa9eb36ed81245f7444081e401aa10146670891fbac5"
+		},
+		"testnet-Carlo" : {
+			"address": "0x934cc6f3a49924f1",
+			"Public Key": "b9bb3e6f40b3b754e7f1ee18bba8136c0421846e195f54a2662a59b5abaa383b766fb330c436f5aa0e7364966f45cd182d827c58b2fbe0d0c8a44f33caa8f1ad",
+			"key": "54bc1f263ce2b2d6cf61879c6ddf60bac6f414a09f88580e9ba64c309c9d4f05"
+		}
+	},
+	"deployments": {
+		"emulator": {
+			"emulator-account": [
+				"FungibleToken",
+				"NonFungibleToken",
+				"MetadataViews",
+				"PunstersNFT",
+				"StarRealm"
+			]
+		  },
+		  "testnet": {
+			"testnet-subtwo": [
+				"FungibleToken",
+				"NonFungibleToken",
+				"MetadataViews",
+				"PunstersNFT",
+				"StarRealm"
+			]
+		  }
+	}
+}
