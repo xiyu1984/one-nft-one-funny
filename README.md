@@ -32,7 +32,7 @@ We can find some similar successful products in the Web2 world, such as Facebook
 * Besides Flow, we are trying to provide advertising access interfaces to other chains, without losing the unique resource features provided by Flow.
 
 ### Technology Architecture
-![image](https://user-images.githubusercontent.com/83746881/180391361-b868824b-584b-4ab7-8095-da60279015df.png)
+![image](https://user-images.githubusercontent.com/83746881/180392687-5d3400e2-61a8-4e1f-8f19-92945ee84199.png)
 The key points of the technology are as follows:  
 * `Following` mechanism can be implemented easily on Flow by resource interactions. 
 * `Funny index` evaluation algorithm in the `Commend` mechanism can make out an estimation of how funny a `Duanji` or a `Punster` is, which depends on both commending counts and time passed.
