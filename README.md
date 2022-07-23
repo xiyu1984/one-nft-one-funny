@@ -23,7 +23,7 @@ We can find some similar successful products in the Web2 world, such as Facebook
 
 ## Solution
 ### Product  
-(need a picture to explain)
+![演示文稿4_02](https://user-images.githubusercontent.com/83746881/180390775-08bf330d-44a3-45a5-b951-808a6af7ea03.jpg)
 * People publish `Duanji` to share funny things.
 * If one person thinks some other `punsters` are interesting, he can `follow` them to get the newest information as soon as the followed `punsters` publish any updates.  
 * If one person likes a `Duanji`, he can `commend` it, so that, the "Funny Index" of the `Duanji` will be increased, and the related `punster` who published the `Duanji`.
@@ -32,14 +32,15 @@ We can find some similar successful products in the Web2 world, such as Facebook
 * Besides Flow, we are trying to provide advertising access interfaces to other chains, without losing the unique resource features provided by Flow.
 
 ### Technology Architecture
-(need a technical picture to explain)  
+![image](https://user-images.githubusercontent.com/83746881/180392687-5d3400e2-61a8-4e1f-8f19-92945ee84199.png)
 The key points of the technology are as follows:  
 * `Following` mechanism can be implemented easily on Flow by resource interactions. 
 * `Funny index` evaluation algorithm in the `Commend` mechanism can make out an estimation of how funny a `Duanji` or a `Punster` is, which depends on both commending counts and time passed.
 * Advertisement mechanism based on `funny index` of `Punsters`.
-* A cross-chain trading market system.
+* A cross-chain access system.
 
 ### Logo
+![3333](https://user-images.githubusercontent.com/83746881/180390840-091e029d-2577-4c30-9c52-0ffb00dd1336.png)
 ### Marketing
 
 # Programming in Web3 Jam
@@ -68,7 +69,7 @@ The key points of the technology are as follows:
 | Zack W | Full-Stack Engineer | ... | [Github](https://github.com/xiyu1984)  |
 | Jason | All-round talent | ... | Weixin id: *HopeOfTown* <br> Weixin Name: *404NotFound*  |
 
-# API for Developers
+# Try with `Flow CLI`
 The transactions and scripts to invoke resource operations and query resource statements are as follows:
 
 ## Transactions
