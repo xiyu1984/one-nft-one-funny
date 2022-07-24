@@ -51,6 +51,9 @@ flow transactions send ./transaction/clearUpdates.cdc --signer testnet-account -
 # Destroy Punster
 flow transactions send ./transaction/destroyPunster.cdc --signer testnet-account -n testnet
 
+# transfer `Duanji` to others
+flow transaction send ./transaction/transferPunStar/transferDuanji.cdc --signer testnet-Alice -n testnet
+
 
 # ------------------------------------------------------------------------
 # View(with scripts)
