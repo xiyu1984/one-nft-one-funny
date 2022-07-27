@@ -84,6 +84,9 @@ flow scripts execute ./scripts/queryAllPunsters.cdc -n testnet
 # query punster view
 flow scripts execute ./scripts/getPunsterView.cdc 0x01cf0e2f2f715450 -n testnet
 
+# query latest Duanji
+flow scripts execute ./scripts/getLatestDuanji.cdc 0xa209381a3f3a28e8 -n testnet
+
 
 # ------------------------------------------------------------------------
 # For test
