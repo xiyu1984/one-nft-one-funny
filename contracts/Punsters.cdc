@@ -1,5 +1,6 @@
 import MetadataViews from "./MetadataViews.cdc"
 import NonFungibleToken from "./NonFungibleToken.cdc"
+import StarRealm from "./StarRealm.cdc"
 
 pub contract PunstersNFT: NonFungibleToken {
     // -----------------------------------------------------------------------
@@ -385,7 +386,7 @@ pub contract PunstersNFT: NonFungibleToken {
 
     // `Punster` is a NFT and a NFT collection for `Duanji` NFT
     // This NFT will be locked for a time before being traded again
-    pub resource Collection: IPunsterPublic, NonFungibleToken.INFT, MetadataViews.Resolver, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+    pub resource Collection: StarRealm.StarDocker, IPunsterPublic, NonFungibleToken.INFT, MetadataViews.Resolver, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
         pub let id: UInt64;
         pub let timestamp: UFix64;
         // pub let acct: Address;
@@ -746,11 +747,12 @@ pub contract PunstersNFT: NonFungibleToken {
         // -----------------------------------------------------------------------
         // StarDocker API, used for locker
         // -----------------------------------------------------------------------
-        pub fun docking(nft: @AnyResource{NonFungibleToken.INFT}) {
+        pub fun docking(nft: @AnyResource{NonFungibleToken.INFT}): @AnyResource{NonFungibleToken.INFT}? {
             if let duanjiNFT <- (nft as? @NonFungibleToken.NFT){
                 self.deposit(token: <- duanjiNFT);
+                return nil;
             } else {
-                destroy nft;
+                return <- nft;
             }
         }
 

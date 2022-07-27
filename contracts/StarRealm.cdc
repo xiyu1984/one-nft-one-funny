@@ -1,23 +1,28 @@
 import NonFungibleToken from "./NonFungibleToken.cdc"
 
 pub contract StarRealm {
+
+    pub let PortStoragePath: StoragePath;
+    pub let DockerPublicPath: PublicPath;
+
     // -----------------------------------------------------------------------
     // StarDocker API, used for locker
+    // Return nil if successed, and return `nft` itself if failed
     // -----------------------------------------------------------------------
     pub resource interface StarDocker {
-        pub fun docking(nft: @AnyResource{NonFungibleToken.INFT});
+        pub fun docking(nft: @AnyResource{NonFungibleToken.INFT}): @AnyResource{NonFungibleToken.INFT}?;
     }
 
     pub resource StarPort: StarDocker {
-        priv var punster: @AnyResource{NonFungibleToken.INFT}?;
+        priv var ownedNFT: @AnyResource{NonFungibleToken.INFT}?;
 
         init() {
-            self.punster <- nil;
+            self.ownedNFT <- nil;
         }
 
         pub fun sailing(): @AnyResource{NonFungibleToken.INFT}? {
-            if let punsterRes <- self.punster <- nil {
-                return <- punsterRes;
+            if let nftRes <- self.ownedNFT <- nil {
+                return <- nftRes;
             } else {
                 return nil
             }
@@ -25,20 +30,33 @@ pub contract StarRealm {
 
         // -----------------------------------------------------------------------
         // StarDocker API, used for locker
+        // Return nil if successed, and return `nft` itself if failed
         // -----------------------------------------------------------------------
-        pub fun docking(nft: @AnyResource{NonFungibleToken.INFT}) {
-            // if let oldpunster <- self.punster <- punster {
-            //     destroy oldpunster
-            // } else {
-            //     self.punster <-! punster;
-            // }
-            let oldpunster <- self.punster <- nft;
-            destroy oldpunster;
+        pub fun docking(nft: @AnyResource{NonFungibleToken.INFT}): @AnyResource{NonFungibleToken.INFT}? {
+            if self.ownedNFT == nil {
+                self.ownedNFT <-! nft;
+                return nil;
+            } else {
+                return <- nft;
+            }
+            // let oldpunster <- self.punster <- nft;
+            // destroy oldpunster;
         }
 
         destroy() {
-            destroy self.punster;
+            destroy self.ownedNFT;
         }
+    }
+
+    init() {
+        self.PortStoragePath = StoragePath(identifier: "PortStoragePath".concat(self.account.address.toString()))!;
+        self.DockerPublicPath = PublicPath(identifier: "DockerPublicPath".concat(self.account.address.toString()))!;
+    }
+
+    pub fun getStarDockerFromAddress(addr: Address): &{StarRealm.StarDocker}? {
+        let pubAcct = getAccount(addr);
+        let docker = pubAcct.getCapability<&{StarRealm.StarDocker}>(self.DockerPublicPath);
+        return docker.borrow();
     }
 
     pub fun createStarPort(): @StarPort {
