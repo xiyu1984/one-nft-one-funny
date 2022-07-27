@@ -596,7 +596,7 @@ pub contract PunstersNFT: NonFungibleToken {
 
         pub fun getLatestDuanjiView(): DuanjiView? {
             if let lastKeyIndex = self.latestIdx {
-                let id = self.ownedNFTs.keys[lastKeyIndex]
+                let id = UInt64(lastKeyIndex);
                 if let nft = self.borrowDuanji(id: id) {
                     if let url = nft.getURL() {
                         return DuanjiView(id: nft.id, owner: self.owner!.address, description: nft.metadata[PunstersNFT.descriptionKey]! as! String,

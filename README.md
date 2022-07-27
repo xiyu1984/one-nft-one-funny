@@ -120,7 +120,7 @@ The related `Flow CLI` is as follow:
 ```sh
 flow transactions send ./transaction/unfollowTo.cdc 0x05ede3f803407aae --signer <signer-account-info> -n testnet
 ```
-* * The first parameter `0x05ede3f803407aae` is the account to unfollow
+* The first parameter `0x05ede3f803407aae` is the account to unfollow
 
 ### Post ads.
 The related `Flow CLI` is as follow:
@@ -143,6 +143,14 @@ The related `Flow CLI` is as follow:
 flow transactions send ./transaction/destroyPunster.cdc --signer testnet-account -n testnet
 ```
 * Destroy owned Punster. All of the owned `Duanji` and relationships will be cleared. But the commends to `Duanji`s will not be liquidated. 
+
+### transfer `Duanji` to others
+The related `Flow CLI` is as follow:
+```sh
+flow transaction send ./transaction/transferPunStar/transferDuanji.cdc 0x05ede3f803407aae 1 --signer testnet-Alice -n testnet
+```
+* The first parameter `0x05ede3f803407aae` is the account to receive the `Duanji`
+* The second parameter `1` is the id of the `Duanji`
 
 ## Scripts
 ### query all following duanji
