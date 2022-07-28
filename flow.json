@@ -53,6 +53,16 @@
 			"address": "0x934cc6f3a49924f1",
 			"Public Key": "b9bb3e6f40b3b754e7f1ee18bba8136c0421846e195f54a2662a59b5abaa383b766fb330c436f5aa0e7364966f45cd182d827c58b2fbe0d0c8a44f33caa8f1ad",
 			"key": "54bc1f263ce2b2d6cf61879c6ddf60bac6f414a09f88580e9ba64c309c9d4f05"
+		},
+		"testnet-Davy" : {
+			"address": "0xa8913f4f31ead2ee",
+			"Public Key": "579246cad15865f4537d6ef83e3ae6b1ebe365b1feb5fa63d3536855f3fda642669d111330afceb53495ffaf617d095b881bcab3ae13ce2dd0a12a9384a7a07e",
+			"key": "eee23a6d3c3c853d42c0ba71c94cdc982b22d9c940ad8a90dc497a85ac534994"
+		},
+		"testnet-Eason" : {
+			"address": "0x5f37faed5f558aca",
+			"Public Key": "0d7ebc326d4b8df0b0290135688ad3822db1d41899a290d138c39d2ff990d7e1c524b015ecacd3c309b7c13f4a879c56c6f735e7904c601503ab4613b29efec3",
+			"key": "89c292ef9656a3767f4867befc355fd445ad90be8ceeef358ed84d829d2ecffd"
 		}
 	},
 	"deployments": {
