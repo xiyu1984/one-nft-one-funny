@@ -46,7 +46,7 @@ pub contract PunstersNFT: NonFungibleToken {
         // self.IDuanjiPublicPath = /public/IDuanjiPublicPath;
 
         self.PunsterTotal = 1;
-        self.DuanjiTotal = 1;
+        self.DuanjiTotal = 1000000;
 
         self.totalSupply = 0;
         self.registeredPunsters = {};
