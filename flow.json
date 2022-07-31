@@ -20,12 +20,13 @@
 	"accounts": {
 		"emulator-account": {
 			"address": "f8d6e0586b0a20c7",
-			"Public Key": "b0868617d903cd9abf71c21d48d03665791fe7b3145443fe07efce04ea841ee9e19909b97cd982bba5556f45fdd856c7c344017b9dbb0ec6de3d779963a195fc",
-			"key": "a0410f663e920c4a1331fdfefde062c260f82329543c382abbc63cc1fde3ae73"
+			"publicKey": "bb499b3527649d37f86d4a16e83aae2f9bd64de510077cf8c5fcb12eafc96c93a0425ac965ce4eb2cc2dd5a350569f10035b4308aadfc544415ddc812f919025",
+      		"key": "69e7e51ead557351ade7a575e947c4d4bd19dd8a6cdf00c51f9c7f6f721b72dc"
 		},
 		"emulator-Alice": {
 			"address": "0x01cf0e2f2f715450",
-			"key": "5546540bc17887e5c9d490bb756faa2535269a41e956242d30db4d137fe034ef"
+			"publicKey": "81262aa27f1630ccf1293300e8e1d9a6ba542dffa796b860d53873867175e9d31bd7b7581d2f200f9c3dfdbc10ae912ff036946981e3d8996a14f186d20e3e2f",
+			"key": "c9193930b34dd498378e36c35118a627d9eb500f6fd69b16d8e59db7cc8f5bb3"
 		},
 		"testnet-account" : {
 			"address": "0x33a8abe2196c9e15",
@@ -53,6 +54,16 @@
 			"address": "0x934cc6f3a49924f1",
 			"Public Key": "b9bb3e6f40b3b754e7f1ee18bba8136c0421846e195f54a2662a59b5abaa383b766fb330c436f5aa0e7364966f45cd182d827c58b2fbe0d0c8a44f33caa8f1ad",
 			"key": "54bc1f263ce2b2d6cf61879c6ddf60bac6f414a09f88580e9ba64c309c9d4f05"
+		},
+		"testnet-Davy" : {
+			"address": "0xa8913f4f31ead2ee",
+			"Public Key": "579246cad15865f4537d6ef83e3ae6b1ebe365b1feb5fa63d3536855f3fda642669d111330afceb53495ffaf617d095b881bcab3ae13ce2dd0a12a9384a7a07e",
+			"key": "eee23a6d3c3c853d42c0ba71c94cdc982b22d9c940ad8a90dc497a85ac534994"
+		},
+		"testnet-Eason" : {
+			"address": "0x5f37faed5f558aca",
+			"Public Key": "0d7ebc326d4b8df0b0290135688ad3822db1d41899a290d138c39d2ff990d7e1c524b015ecacd3c309b7c13f4a879c56c6f735e7904c601503ab4613b29efec3",
+			"key": "89c292ef9656a3767f4867befc355fd445ad90be8ceeef358ed84d829d2ecffd"
 		}
 	},
 	"deployments": {
@@ -66,7 +77,7 @@
 			]
 		  },
 		  "testnet": {
-			"testnet-subtwo": [
+			"testnet-Bob": [
 				"FungibleToken",
 				"NonFungibleToken",
 				"MetadataViews",

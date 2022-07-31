@@ -1,5 +1,6 @@
 import MetadataViews from "./MetadataViews.cdc"
 import NonFungibleToken from "./NonFungibleToken.cdc"
+import StarRealm from "./StarRealm.cdc"
 
 pub contract PunstersNFT: NonFungibleToken {
     // -----------------------------------------------------------------------
@@ -44,7 +45,7 @@ pub contract PunstersNFT: NonFungibleToken {
         // self.DuanjiStoragePath = /storage/DuanjiStoragePath;
         // self.IDuanjiPublicPath = /public/IDuanjiPublicPath;
 
-        self.PunsterTotal = 1;
+        self.PunsterTotal = 1000000;
         self.DuanjiTotal = 1;
 
         self.totalSupply = 0;
@@ -385,7 +386,7 @@ pub contract PunstersNFT: NonFungibleToken {
 
     // `Punster` is a NFT and a NFT collection for `Duanji` NFT
     // This NFT will be locked for a time before being traded again
-    pub resource Collection: IPunsterPublic, NonFungibleToken.INFT, MetadataViews.Resolver, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
+    pub resource Collection: StarRealm.StarDocker, IPunsterPublic, NonFungibleToken.INFT, MetadataViews.Resolver, NonFungibleToken.Provider, NonFungibleToken.Receiver, NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection {
         pub let id: UInt64;
         pub let timestamp: UFix64;
         // pub let acct: Address;
@@ -459,7 +460,7 @@ pub contract PunstersNFT: NonFungibleToken {
         // -----------------------------------------------------------------------
         pub fun withdraw(withdrawID: UInt64): @NonFungibleToken.NFT {
             let token <- self.ownedNFTs.remove(key: withdrawID) ?? panic("missing NFT")
-            emit Withdraw(id: token.id, from: self.owner?.address)
+            // emit Withdraw(id: token.id, from: self.owner?.address)
             return <-(token as! @NonFungibleToken.NFT)
         }
 
@@ -467,7 +468,7 @@ pub contract PunstersNFT: NonFungibleToken {
             let token <- token as! @NFT
             let id: UInt64 = token.id
             let oldToken <- self.ownedNFTs[id] <- token
-            emit Deposit(id: id, to: self.owner?.address)
+            // emit Deposit(id: id, to: self.owner?.address)
             destroy oldToken
         }
 
@@ -744,6 +745,18 @@ pub contract PunstersNFT: NonFungibleToken {
         }
 
         // -----------------------------------------------------------------------
+        // StarDocker API, used for locker
+        // -----------------------------------------------------------------------
+        pub fun docking(nft: @AnyResource{NonFungibleToken.INFT}): @AnyResource{NonFungibleToken.INFT}? {
+            if let duanjiNFT <- (nft as? @NonFungibleToken.NFT){
+                self.deposit(token: <- duanjiNFT);
+                return nil;
+            } else {
+                return <- nft;
+            }
+        }
+
+        // -----------------------------------------------------------------------
         // Resouce API
         // -----------------------------------------------------------------------
         pub fun publishDuanji(description: String, ipfsURL: String) {
@@ -838,7 +851,7 @@ pub contract PunstersNFT: NonFungibleToken {
 
     // one account, one `Punster` NFT
     // This function is used for everyone to create 
-    pub fun registerPunster(addr: Address, description: String, ipfsURL: String): @Collection{
+    pub fun registerPunster(addr: Address, description: String, ipfsURL: String): @PunstersNFT.Collection{
         let punsterRes <- create Collection(id: self.PunsterTotal, acct: addr, description: description, ipfsURL: ipfsURL);
         self.PunsterTotal = self.PunsterTotal + 1; 
         self.registeredPunsters[punsterRes.id] = addr;
