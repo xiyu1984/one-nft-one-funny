@@ -11,6 +11,10 @@ transaction () {
                         acct.unlink(StarRealm.DockerPublicPath);
                         acct.link<&{PunstersNFT.IPunsterPublic}>(PunstersNFT.IPunsterPublicPath, target: PunstersNFT.PunsterStoragePath);
                         acct.link<&{StarRealm.StarDocker}>(StarRealm.DockerPublicPath, target: PunstersNFT.PunsterStoragePath);
+
+                        let punsterRef = acct.borrow<&PunstersNFT.Collection>(from: PunstersNFT.PunsterStoragePath)!;
+                        PunstersNFT.updateRegisteredPunster(punster: punsterRef);
+
                     } else {
                         panic("Ported thing is not `Punster`");
                     }

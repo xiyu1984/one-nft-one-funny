@@ -867,6 +867,10 @@ pub contract PunstersNFT: NonFungibleToken {
         self.registeredPunsters.remove(key: punsterID);
     }
 
+    pub fun updateRegisteredPunster(punster: &PunstersNFT.Collection) {
+        self.registeredPunsters[punster.id] = punster.owner!.address;
+    }
+
     // Get Funny Index
     pub fun getDuanjiFunnyIndex(ownerAddr: Address, duanjiID: UInt64): UInt32?{
         if let punsterRef = self.getIPunsterFromAddress(addr: ownerAddr) {

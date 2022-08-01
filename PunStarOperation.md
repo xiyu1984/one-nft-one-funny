@@ -86,6 +86,27 @@ flow transaction send ./transaction/transferPunStar/transferDuanji.cdc 0x05ede3f
 * The first parameter `0x05ede3f803407aae` is the account to receive the `Duanji`
 * The second parameter `1` is the id of the `Duanji`
 
+### create StarRealm
+```sh
+flow transactions send ./transaction/transferPunStar/createStarPort.cdc --signer emulator-Alice
+```
+* `StarPort` is used for transfering `Punster` from one account to another
+
+### get punster from self ported
+```sh
+flow transactions send ./transaction/transferPunStar/getPunsterFromPorted.cdc --signer emulator-Alice
+```
+* `Punster` needs to be saved in your account storage path(`PunstersNFT.PunsterStoragePath`) before used
+* `Punster`'s owner ship will be updated throungh `PunstersNFT.updateRegisteredPunster`
+
+### transfer punster to
+```sh
+flow transactions send ./transaction/transferPunStar/transferPunster.cdc 0x01cf0e2f2f715450
+```
+* The first parameter `0x01cf0e2f2f715450` is the target address
+* Make sure there's no `Punster` in the target address, or the transfer will fail
+* Make sure the `StarPort` has been created in the target address, or the transfer will fail
+
 ## Scripts
 ### query all following duanji
 ```sh

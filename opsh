@@ -56,7 +56,7 @@ flow transactions send ./transaction/clearUpdates.cdc --signer testnet-account -
 flow transactions send ./transaction/destroyPunster.cdc --signer testnet-account -n testnet
 
 # transfer `Duanji` to others
-flow transactions send ./transaction/transferPunStar/transferDuanji.cdc --signer testnet-Alice -n testnet
+flow transactions send ./transaction/transferPunStar/transferDuanji.cdc 0x01cf0e2f2f715450 1 --signer testnet-Alice -n testnet
 
 # create StarRealm
 flow transactions send ./transaction/transferPunStar/createStarPort.cdc --signer emulator-Alice
