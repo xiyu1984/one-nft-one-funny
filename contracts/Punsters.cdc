@@ -451,7 +451,7 @@ pub contract PunstersNFT: NonFungibleToken {
             PunstersNFT.destroyPunsters(punsterID: self.id);
         }
 
-        destroy () {
+        access(contract) destroy () {
             destroy self.ownedNFTs;
         }
 
@@ -866,6 +866,14 @@ pub contract PunstersNFT: NonFungibleToken {
     access(contract) fun destroyPunsters(punsterID: UInt64) {
         self.registeredPunsters.remove(key: punsterID);
     }
+
+    // pub fun clearAllPunsters(punsterID: UInt64) {
+    //     self.registeredPunsters.remove(key: punsterID);
+    // }
+
+    // pub fun setPunsterID(id: UInt64) {
+    //     self.PunsterTotal = id;
+    // }
 
     pub fun updateRegisteredPunster(punster: &PunstersNFT.Collection) {
         self.registeredPunsters[punster.id] = punster.owner!.address;

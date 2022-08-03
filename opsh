@@ -67,6 +67,13 @@ flow transactions send ./transaction/transferPunStar/getPunsterFromPorted.cdc --
 # transfer punster to
 flow transactions send ./transaction/transferPunStar/transferPunster.cdc 0x01cf0e2f2f715450
 
+# delete data
+flow transactions send ./transaction/clearData/deleteStarPort.cdc --signer testnet-Eason -n testnet
+
+flow transactions send ./transaction/clearData/deletePunster.cdc --signer testnet-Eason -n testnet
+
+flow transactions send ./transaction/clearData/deleteDuanji.cdc 1 --signer testnet-Eason -n testnet
+
 
 # ------------------------------------------------------------------------
 # View(with scripts)

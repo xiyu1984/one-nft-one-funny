@@ -1,11 +1,11 @@
-import PunstersNFT from 0x05ede3f803407aae
-import NonFungibleToken from 0x05ede3f803407aae
+import PunstersNFT from "../../contracts/Punsters.cdc"
 
 transaction () {
 
   prepare(acct: AuthAccount) {
 
     if let resPunster <- acct.load<@PunstersNFT.Collection>(from: PunstersNFT.PunsterStoragePath) {
+        resPunster.preDestroy();
         destroy resPunster;
     }
   }
