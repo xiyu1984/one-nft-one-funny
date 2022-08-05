@@ -62,7 +62,7 @@
 
 ### `Duanji` transfering
 * The funny things can be *assetization*, that is, as `Duanji` is a standard NFT on Flow, it can be traded. The reality value is supported by the content of the funny thing, and also be supported by the commends it gets, which will make the `cooling time` of advertising of a punster shorter.   
-(add a picture)
+![image](https://user-images.githubusercontent.com/83746881/183116625-776d056e-6961-4bd5-810f-74f928320953.png)
 
 ### `Punster` transfering: 
 * The `social relationship` established by `Following` mechanisms can be *assetization*, and also the reality functions like advertising. Punster is also an NFT on Flow, it can be traded too. The reality value is supported by all the `Duanji` a punster published, and real abilities like advertising, based on which we may construct e-commerce abilities in the future.  
