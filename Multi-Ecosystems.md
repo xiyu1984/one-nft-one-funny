@@ -1,19 +1,20 @@
 # User Guide
 ## Deployment
+* Contract defination address: `0x1a478a7149935b63`
 
-
-### Flow to Rinkeby
-
+## Usage
+### Prepare(Can be ignored)
 ```sh
-# Mint Duanji
-flow transactions send ./transaction/registerPunster.cdc "I'm punster xxx" "My IPFS url"
+# Register `Punster` and publish `Duanji`. This can be ignored if registering `Punster` and publishing `Duanji` have already happened through our website http://punster.stonelens.com/
+flow transactions send ./transaction/registerPunster.cdc "I'm punster xxx" <Real IPFS URL>
 
-flow transactions send ./transaction/publishDuanji.cdc "I found the dog is so funny" "https://raw.githubusercontent.com/wuyahuang/opensea/main/1"
+flow transactions send ./transaction/publishDuanji.cdc "I found the dog is so funny" <Real IPFS URL>
 
 # Query NFT on Flow
 flow scripts execute ./scripts/queryDuanjiFrom.cdc 0xf8d6e0586b0a20c7
 ```
 
+### Flow to Rinkeby
 ```sh
 # Go to work dictionary
 cd multi-ecosystem
