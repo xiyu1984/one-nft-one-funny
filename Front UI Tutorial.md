@@ -80,6 +80,6 @@
   
 
 ## Multi-Ecosystem Extension
-We provide the ablity that user can transfer their `Duanji` NFT and `Punster` NFT to *Rinkeby(Testnet of Ethereum)*, which makes the NFTs of PunStar could be exhibited and exchanged on *Opensea*.  
+We provide the ability that user can transfer their `Duanji` NFT and `Punster` NFT to *Rinkeby(Testnet of Ethereum)*, which makes the NFTs of PunStar could be exhibited and exchanged on *Opensea*.  
 Unfortunately we have not enough time to integrate it in to the front UI. But we have prepared related transactions and scripts, and you can find the [detailed tutorial](./Multi-Ecosystems.md) of how to operate `Multi-Ecosystem` ablities.
 
