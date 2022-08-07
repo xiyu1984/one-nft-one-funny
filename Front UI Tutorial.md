@@ -1,6 +1,6 @@
 # PunStar 
 ## Index
-* [Website](#website)
+* [Front Website](#website)
 * [Prepare](#prepare)
     * [Wallet](#register)
     * [Faucet](#faucet)
@@ -18,9 +18,9 @@
 * [Multi-Ecosystem Extension](#multi-ecosystem-extension)
 
 
-## Website
+## Front Website
 
-* [Website](http://punster.stonelens.com/)
+* [Front UI](http://punster.stonelens.com/)
 
 ## Prepare
 ### Register
