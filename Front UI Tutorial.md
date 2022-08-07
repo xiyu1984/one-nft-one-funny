@@ -66,11 +66,18 @@
 
 ### `Punster` transfering: 
 * The `social relationship` established by `Following` mechanisms can be *assetization*, and also the reality functions like advertising. Punster is also an NFT on Flow, it can be traded too. The reality value is supported by all the `Duanji` a punster published, and real abilities like advertising, based on which we may construct e-commerce abilities in the future.  
-* Before `Punster` transfering to others or get `Punster` from others, you need create `StarPort` first:  
-(add a picture)
+* Note that in this version one account can only hold on `Punster` 
+* You can transfer `Punster` to others, and this operation will transfer all the static and dynamic features of `Punster` NFT, which is very different from NFT on other public chains.  
+![image](https://user-images.githubusercontent.com/83746881/183297210-975fa812-b758-4eb1-84dc-e2a00c61584e.png)
+* Enter the target address and click `Ok` to submit the transferring. If the account of the target address has no `Punster` yet and it has already created a `StarPort`, the transferring will success. 
+![image](https://user-images.githubusercontent.com/83746881/183297251-95e2c5ba-b110-4144-a79b-9e57e331e487.png)
 
-* After creating `StarPort`, you can transfer `Punster` to others, and this operation will transfer all the static and dynamic features of `Punster` NFT, which is very different from NFT on other public chains.  
-(add a picture)
+* Before the receiver gets `Punster` from others, it needs to create `StarPort` first, which is used for receiving the resource of `Punster` like any token vault on Flow does. Or the `Transfer` above will fail:  
+![image](https://user-images.githubusercontent.com/83746881/183297124-b96ce7b5-e514-4789-b7c0-66fcd69835a5.png)
+* The target account needs to execute `Receive Punster` mannually before `CreateDuanji` at this version. This operation *moves* the instance of `Punster` resource from resource `StarPort` to the accout's storage path. This is a special feature on Flow
+![image](https://user-images.githubusercontent.com/83746881/183298100-e15979b9-8db5-4402-9eec-c721f7b2bb1d.png)
+
+  
 
 ## Multi-Ecosystem Extension
 We provide the ablity that user can transfer their `Duanji` NFT and `Punster` NFT to *Rinkeby(Testnet of Ethereum)*, which makes the NFTs of PunStar could be exhibited and exchanged on *Opensea*.  
