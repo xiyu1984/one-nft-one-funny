@@ -74,7 +74,7 @@
 
 * Before the receiver gets `Punster` from others, it needs to create `StarPort` first, which is used for receiving the resource of `Punster` like any token vault on Flow does. Or the `Transfer` above will fail:  
 ![image](https://user-images.githubusercontent.com/83746881/183297124-b96ce7b5-e514-4789-b7c0-66fcd69835a5.png)
-* The target account needs to execute `Receive Punster` mannually before `CreateDuanji` at this version. This operation *moves* the instance of `Punster` resource from resource `StarPort` to the accout's storage path. This is a special feature on Flow
+* If one account receives a transferring of `Punster` for others, the account needs to execute `Receive Punster` mannually before `CreateDuanji` at this version. This operation *moves* the instance of `Punster` resource from resource `StarPort` to the accout's storage path. This is a special feature on Flow
 ![image](https://user-images.githubusercontent.com/83746881/183298100-e15979b9-8db5-4402-9eec-c721f7b2bb1d.png)
 
   
