@@ -36,8 +36,8 @@ transaction (to: Address) {
                                 destroy rst;
                             }
                         } else {
-                    panic("Target docker does not exists!")
-                }
+                            panic("Target docker does not exists!")
+                        }
                     }else {
                         panic("No `Punster` exists!");
                     }

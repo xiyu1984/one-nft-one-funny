@@ -107,8 +107,8 @@ async function crossChainMint(msgID, tokenId, receiver, tokenURL, randomNumberHa
         script: script,
         args: [
             fcl.arg(signer.address, types.Address),
-            fcl.arg(config.get("emulator").address, types.Address), // Locker contract address
-            fcl.arg(msgID, types.UInt128),
+            fcl.arg(config.get("testnet-Bob").address, types.Address), // Locker contract address
+            fcl.arg(msgID.toString(), types.UInt128),
             fcl.arg(fromChain, types.String),
             fcl.arg(toChain, types.String),
             fcl.arg(sqosString, types.String),
@@ -149,7 +149,7 @@ async function crossChainMint(msgID, tokenId, receiver, tokenURL, randomNumberHa
     let response = await flowService.sendTx({
         transaction,
         args: [
-            fcl.arg(msgID, types.UInt128),
+            fcl.arg(msgID.toString(), types.UInt128),
             fcl.arg(fromChain, types.String),
             fcl.arg(toChain, types.String),
             fcl.arg(sqosString, types.String),

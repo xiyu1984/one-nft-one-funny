@@ -74,6 +74,9 @@ flow transactions send ./transaction/clearData/deletePunster.cdc --signer testne
 
 flow transactions send ./transaction/clearData/deleteDuanji.cdc 1 --signer testnet-Eason -n testnet
 
+# Force link
+flow transactions send ./transaction/transferPunStar/forceLinkStarPort.cdc --signer testnet-Eason -n testnet
+
 
 # ------------------------------------------------------------------------
 # View(with scripts)

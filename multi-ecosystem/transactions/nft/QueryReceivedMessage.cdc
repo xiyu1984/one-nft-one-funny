@@ -1,5 +1,5 @@
-import ReceivedMessageContract from 0xf8d6e0586b0a20c7;
-import CrossChain from 0xf8d6e0586b0a20c7;
+import ReceivedMessageContract from 0x1a478a7149935b63;
+import CrossChain from 0x1a478a7149935b63;
 
 pub fun main(
     recvAddress: Address,

@@ -27,7 +27,7 @@ async function crossChainClaim(tokenId, randomNumber) {
         console.log('ownerOf: ' + ownerOf);
 
         const tokenURI = await ethereum.contractCall(NFTContract, 'tokenURI', [tokenId]);
-        console.log('ownerOf: ' + tokenURI);
+        console.log('tokenURI: ' + tokenURI);
     }, 3000);
 
 }

@@ -20,23 +20,26 @@ flow scripts execute ./scripts/queryDuanjiFrom.cdc 0xf8d6e0586b0a20c7
 cd multi-ecosystem
 
 # Tranfer Duanji to locker
-flow transactions send ./transactions/CrossChainNFT/sendDuanji2Opensea.cdc 0x70e730a085eb1437b29c36d615c78648ef8be1bc19688b437ecbc1cf89b8b217 0x71Fa7558e22Ba5265a1e9069dcd2be7c6735BE23 1
+flow transactions send ./transactions/CrossChainNFT/sendDuanji2Opensea.cdc 0x70e730a085eb1437b29c36d615c78648ef8be1bc19688b437ecbc1cf89b8b217 0x71Fa7558e22Ba5265a1e9069dcd2be7c6735BE23 <id> --signer testnet-Frank -n testnet
 
 # Claim Duanji on Rinkeby testnet
-node client/crosschain/ethereumClaim.js 1 044cecaa8c944515dfc8bbab90c34a5973e75f60015bfa2af985176c33a91217
+node client/crosschain/ethereumClaim.js <id> 044cecaa8c944515dfc8bbab90c34a5973e75f60015bfa2af985176c33a91217
 ```
 
 ### Rinkeby to Flow
 ```sh
 # Lock Rinkeby NFT
-node client/nft/lockOpenseaDuanji.mjs 1 0x70e730a085eb1437b29c36d615c78648ef8be1bc19688b437ecbc1cf89b8b217 0x01cf0e2f2f715450
+node client/nft/lockOpenseaDuanji.mjs <id> 0x70e730a085eb1437b29c36d615c78648ef8be1bc19688b437ecbc1cf89b8b217 0x3c03aba355023006
 
 # Claim NFT on Flow
-node client/crosschain/flowClaim.js 1 044cecaa8c944515dfc8bbab90c34a5973e75f60015bfa2af985176c33a91217
+node client/crosschain/flowClaim.js <id> 044cecaa8c944515dfc8bbab90c34a5973e75f60015bfa2af985176c33a91217 --signer testnet-Frank -n testnet
 
 # Burn NFT on Rinkeby
-node client/crosschain/burnRinkebyNFT.js 1
+node client/crosschain/burnRinkebyNFT.js <id>
 ```
+
+
+**Note that remember to burn NFT on Rinkeby mannually in this stage, or the NFT with the same id cannot be transferred to Rinkeby again.**  
 
 ### Check NFT on Opensea browser
 
