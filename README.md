@@ -96,4 +96,4 @@ The key points of the technology are as follows:
 
 ## The details of cross-ecosystem operation are as below:
 * We use an interoperation middleware to make NFTs defined as resource on Flow with flexibile action features be transfered to other chains without losing anything Flow supports. Currently, we use Dante Network as the infrastructure to help us make `Punster` and `Duanji` NFTs be multi-ecosystem resource.
-* [See more details](./CrossEcosystem.md)
+* [See more details](./Multi-Ecosystems.md)
