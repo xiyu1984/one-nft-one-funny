@@ -1,6 +1,8 @@
 # PunStar
 # Introduction
-PunStar is a social platform based on funny. punStar participants are called "Punsters" (an NFT) and they can share their funny things in the form of "Duanji" (an NFT). Each person can express their preference for a "Duanji", which can stimulate the construction of social relationships between participants and let it possible to estimate the "funny index" of each "Punster". The "Punsters" can make content promotions(e.g. publish ads) based on their relationship constructed in PunStar, which needs to satisfy some restrictions based on the "funny index" first. We use Flow's unique mechanism to coalesce social relationships, content promotion, and some other practical abilities into NFT, which is a great enhancement to the existing NFT, allowing NFT to be more realistic and of greater practical value.
+PunStar is a social platform established on Flow. Besides static content features and combinability of normal NFT, we take advantage of Flow's unique resource mechanism to coalesce some innovative properties into NFT and asset them. These innovative properties include dynamical social relationships between participants established by resource interactions on Flow, executable abilities based on methods bound to Flow's resources (some of which have realistic meanings, e.g. advertising), and upgradeable features like `Funny index` which may actually increase NFT's value.  
+
+In this stage, PunStar chooses `Funny things` as the entry point of a social platform, which could be easily extended in the future. The participants of PunStar are called "Punsters" (an NFT) and they can share their funny things in the form of "Duanji" (an NFT). Each person can express their preference for a "Duanji", which can stimulate the construction of social relationships between participants and let it possible to estimate the "funny index" of each "Punster". The "Punsters" can make content promotions(e.g. publish ads) based on their relationship constructed in PunStar, which needs to satisfy some restrictions based on the "funny index" first. We use Flow's unique mechanism to coalesce social relationships, content promotion, and some other practical abilities into NFT, which is a great enhancement to the existing NFT, allowing NFT to be more realistic and of greater practical value.
 
 ## Official Website
 Register to [PunStar](http://punster.stonelens.com/) and start your funny journey. Check the [tutorial](./Front%20UI%20Tutorial.md) if you are new to Flow.
@@ -38,6 +40,8 @@ We can find some similar successful products in the Web2 world, such as Facebook
 ### Technology Architecture
 ![image](https://user-images.githubusercontent.com/83746881/180392687-5d3400e2-61a8-4e1f-8f19-92945ee84199.png)
 The key points of the technology are as follows:  
+* `Duanji` is a standard Flow NFT. Besides static content properties, `Duanji` has its dynamical feature `funny index`.
+* `Punster` is a standard Flow NFT, and it is also a standard Flow *Collection*. A `Punster` NFT can contain lots of `Duanji` NFTs. The dynamical properties of `Punster` include  
 * `Following` mechanism can be implemented easily on Flow by resource interactions. 
 * `Funny index` evaluation algorithm in the `Commend` mechanism can make out an estimation of how funny a `Duanji` or a `Punster` is, which depends on both commending counts and time passed.
 * Advertisement mechanism based on `funny index` of `Punsters`.

@@ -1,6 +1,6 @@
 # PunStar 
 ## Index
-* [Front Website](#website)
+* [Front Website](#front-website)
 * [Prepare](#prepare)
     * [Wallet](#register)
     * [Faucet](#faucet)
