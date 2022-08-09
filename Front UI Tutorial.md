@@ -32,6 +32,8 @@
 ![image](https://user-images.githubusercontent.com/83746881/183077422-96cd1327-f8a1-4e69-8efc-4757d4ee27f3.png)
 ### Faucet
 * Apply for test `Flow` to pay for gas and storage [here](https://testnet-faucet.onflow.org/fund-account)
+![image](https://user-images.githubusercontent.com/83746881/183597445-f409fe26-4950-40d5-bdc3-ba5849b5a719.png)
+
 ### Continue to register
 ![image](https://user-images.githubusercontent.com/83746881/183079767-d3b0cf45-2cb1-40b3-adb6-05ea33db4fdc.png)
 * `Submit` to finish register. This 
