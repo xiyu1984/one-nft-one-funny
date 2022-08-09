@@ -27,12 +27,12 @@ cd multi-ecosystem
 # Tranfer Duanji to locker. 
 flow transactions send ./transactions/CrossChainNFT/sendDuanji2Opensea.cdc <hash lock question> <receiver address on Rinkeby> <Duanji id> --signer <Duanji Owner on Flow> -n testnet
 # Example
-flow transactions send ./transactions/CrossChainNFT/sendDuanji2Opensea.cdc 0x70e730a085eb1437b29c36d615c78648ef8be1bc19688b437ecbc1cf89b8b217 0x71Fa7558e22Ba5265a1e9069dcd2be7c6735BE23 14 --signer testnet-Frank -n testnet
+flow transactions send ./transactions/CrossChainNFT/sendDuanji2Opensea.cdc 0x70e730a085eb1437b29c36d615c78648ef8be1bc19688b437ecbc1cf89b8b217 0x71Fa7558e22Ba5265a1e9069dcd2be7c6735BE23 21 --signer testnet-Frank -n testnet
 
 # Claim Duanji on Rinkeby testnet
 node client/crosschain/ethereumClaim.js <id> <hash lock answer>
 # Example
-node client/crosschain/ethereumClaim.js 14 044cecaa8c944515dfc8bbab90c34a5973e75f60015bfa2af985176c33a91217
+node client/crosschain/ethereumClaim.js 21 044cecaa8c944515dfc8bbab90c34a5973e75f60015bfa2af985176c33a91217
 ```
 
 ### Rinkeby to Flow
@@ -40,16 +40,18 @@ node client/crosschain/ethereumClaim.js 14 044cecaa8c944515dfc8bbab90c34a5973e75
 # Lock Rinkeby NFT
 node client/nft/lockOpenseaDuanji.mjs <id> <hash lock question> <receiver address on target Chain (here it is Flow)>
 # Example
-node client/nft/lockOpenseaDuanji.mjs 14 0x70e730a085eb1437b29c36d615c78648ef8be1bc19688b437ecbc1cf89b8b217 0x3c03aba355023006
+node client/nft/lockOpenseaDuanji.mjs 21 0x70e730a085eb1437b29c36d615c78648ef8be1bc19688b437ecbc1cf89b8b217 0x3c03aba355023006
 
 
 # Claim NFT on Flow
 node client/crosschain/flowClaim.js <id> <hash lock answer> --signer <any account on Flow> -n testnet
 # Example
-node client/crosschain/flowClaim.js 14 044cecaa8c944515dfc8bbab90c34a5973e75f60015bfa2af985176c33a91217 --signer testnet-Frank -n testnet
+node client/crosschain/flowClaim.js 21 044cecaa8c944515dfc8bbab90c34a5973e75f60015bfa2af985176c33a91217 --signer testnet-Frank -n testnet
 
 # Burn NFT on Rinkeby
 node client/crosschain/burnRinkebyNFT.js <id>
+# Example
+node client/crosschain/burnRinkebyNFT.js 21
 ```
 
 

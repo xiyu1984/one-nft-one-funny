@@ -72,7 +72,7 @@ flow transactions send ./transaction/clearData/deleteStarPort.cdc --signer testn
 
 flow transactions send ./transaction/clearData/deletePunster.cdc --signer testnet-Eason -n testnet
 
-flow transactions send ./transaction/clearData/deleteDuanji.cdc 1 --signer testnet-Eason -n testnet
+flow transactions send ./transaction/clearData/deleteDuanji.cdc 1 --signer testnet-Frank -n testnet
 
 # Force link
 flow transactions send ./transaction/transferPunStar/forceLinkStarPort.cdc --signer testnet-Eason -n testnet
@@ -81,7 +81,7 @@ flow transactions send ./transaction/transferPunStar/forceLinkStarPort.cdc --sig
 # ------------------------------------------------------------------------
 # View(with scripts)
 # query all 'duanji' from a Address
-flow scripts execute ./scripts/queryDuanjiFrom.cdc 0x33a8abe2196c9e15 -n testnet
+flow scripts execute ./scripts/queryDuanjiFrom.cdc 0x3c03aba355023006 -n testnet
 
 # query Punster funny index
 flow scripts execute ./scripts/getPunsterFI.cdc 0x05ede3f803407aae -n testnet
