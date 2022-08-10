@@ -21,6 +21,7 @@
 ## Front Website
 
 * [Front UI](http://punster.stonelens.com/)
+* Note that we recommand using `Lilico` wallet to do the operations.
 
 ## Prepare
 ### Register
