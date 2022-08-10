@@ -1,12 +1,12 @@
 import MessageProtocol from "../contracts/MessageProtocol.cdc"
 import SentMessageContract from "../contracts/SentMessageContract.cdc"
 import ReceivedMessageContract from "../contracts/ReceivedMessageContract.cdc"
-import MetadataViews from "./MetadataViews.cdc"
-import NonFungibleToken from "./NonFungibleToken.cdc"
-import StarRealm from  "./StarRealm.cdc"
-// import MetadataViews from 0x1a478a7149935b63
-// import NonFungibleToken from 0x1a478a7149935b63
-// import StarRealm from  0x1a478a7149935b63
+// import MetadataViews from "./MetadataViews.cdc"
+// import NonFungibleToken from "./NonFungibleToken.cdc"
+// import StarRealm from  "./StarRealm.cdc"
+import MetadataViews from 0x1a478a7149935b63
+import NonFungibleToken from 0x1a478a7149935b63
+import StarRealm from  0x1a478a7149935b63
 
 pub contract Locker{
     init(){
@@ -169,6 +169,7 @@ pub contract Locker{
         let NFTResolver <- transferToken as! @AnyResource{MetadataViews.Resolver};
         var tokenURL: String = (NFTResolver.resolveView(Type<MetadataViews.Display>())! as! MetadataViews.Display).thumbnail.uri();
         tokenURL = tokenURL.slice(from: 7, upTo: tokenURL.length);
+        tokenURL = "http://47.242.71.251:8080/ipfs/".concat(tokenURL);
 
         let NonToken <- NFTResolver as! @AnyResource{NonFungibleToken.INFT};
         let id: UInt64 = NonToken.id
