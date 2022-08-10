@@ -15,6 +15,8 @@ flow transactions send ./transaction/publishDuanji.cdc "I found the dog is so fu
 
 # Query NFT on Flow
 flow scripts execute ./scripts/queryDuanjiFrom.cdc <address on Flow> -n testnet
+# Example
+flow scripts execute ./scripts/queryDuanjiFrom.cdc 0x3c03aba355023006 -n testnet
 ```
 
 ### Flow to Rinkeby
@@ -61,8 +63,9 @@ node client/crosschain/burnRinkebyNFT.js 21
 
 Wait for some time...You can see new NFT below:
 ```
-https://testnets.opensea.io/assets?search[query]=0x5818f70E7468e14a048B63E0211A1f4A5A4534e2&search[resultModel]=ASSETS
+https://testnets.opensea.io/assets/rinkeby/0x5818f70e7468e14a048b63e0211a1f4a5a4534e2/21
 ```
+Note that change the last `21` to your own NFT id.
 
 ### Restart Flow emulator
 * If use Flow emulator to make test and the emulator restarts, clear data queue on Rinkeby
