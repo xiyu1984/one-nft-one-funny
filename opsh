@@ -126,3 +126,12 @@ flow scripts execute ./scripts/test/StarRealmTest.cdc
 # Environment
 # Clear the data of resources related to contracts deployed by other accounts
 flow transactions send ./transaction/env/clearDataBefore.cdc --signer testnet-Alice -n testnet
+
+# Multi-Ecosystem signature
+flow keys generate --sig-algo "ECDSA_secp256k1"
+
+flow accounts create --key 023281d6b1c8bfafd70b0d9ffe1f55f61c5844602844e68542655329b33a2c6dffaeccaf987ff08a0df8c57ce58ffee15bbb11361be543106e1600f8927cf2c0 --sig-algo "ECDSA_secp256k1" --hash-algo "SHA2_256"
+
+flow signatures generate "Hello Nika" --signer emulator-Alice
+
+flow signatures verify "Hello Nika2" "efb7437a2b8187b05f9168d3b18fc331a7ea4fe101f64554f383c668bc26a960c1abdcfb83f6e32a1c3acc0c97d3075f243f51dc74bca2155a799a3fe155d4bf" 0x023281d6b1c8bfafd70b0d9ffe1f55f61c5844602844e68542655329b33a2c6dffaeccaf987ff08a0df8c57ce58ffee15bbb11361be543106e1600f8927cf2c0 --sig-algo "ECDSA_secp256k1" --hash-algo "SHA2_256"
