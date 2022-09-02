@@ -71,4 +71,4 @@ The key points of the technology are as follows:
 | Name | Role     | Bio | Contact     |
 | ---- | ------------------- | --- | ----------------------- |
 | Xiyu | Full-Stack Engineer | ... | [Github](https://github.com/xiyu1984)  |
-| Zation | Full-Stack Engineer | ... | [Github](https://github.com/xiyu1984)  |
+| Zation | Full-Stack Engineer | ... | [Github](https://github.com/zation)  |
