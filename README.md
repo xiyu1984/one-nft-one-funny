@@ -47,16 +47,16 @@ We can find some similar successful products in the Web2 world, such as Facebook
 ### Technology Architecture
 ![image](https://user-images.githubusercontent.com/83746881/183852679-d1d23c57-f84f-43c8-afc4-9d31343780f6.png)
 The key points of the technology are as follows:  
-* `Duanji` is a standard Flow NFT. Besides static content properties, `Duanji` has its dynamical feature `funny index`.
-* `Punster` is a standard Flow NFT, and it is also a standard Flow *Collection*. A `Punster` NFT can contain lots of `Duanji` NFTs. The dynamical properties of `Punster` include  
-* `Following` mechanism can be implemented easily on Flow by resource interactions. 
+* `Duanji` is our new architecture NFT compatible with ERC series standard. Besides static content properties, `Duanji` has its dynamical feature `funny index`.
+* `Punster` is our new architecture NFT compatible with ERC series standard, and it is also a NFT container. A `Punster` NFT can contain lots of `Duanji` NFTs. The dynamical properties of `Punster` include  
+* `Following` mechanism can be implemented easily based on resource interactions. 
 * `Funny index` evaluation algorithm in the `Commend` mechanism can make out an estimation of how funny a `Duanji` or a `Punster` is, which depends on both commending counts and time passed.
 * Advertisement mechanism based on `funny index` of `Punsters`.
 * `StarRealm` and `Cross-Chain Locker` provide a Star Port for NFTs to travel to other chains.
 
 ### Marketing
 * The funny `Duanji` is used as the initial entry point for the topic to start the market.
-* Give NFT more dynamical and practical value based on Flow's unique mechanism to attract more user to create to build their social relationships.
+* Give NFT more dynamical and practical value based on resource-oriented mechanism to attract more user to create to build their social relationships.
 * Assetization the practical value of both `Duanji` and `Punster` NFTs, and make everything tradable, so that to improve the activity of PunStar platform.
 * Bring in more dynamical and practical ablities to `Punster` and `Duanji` NFT, such as E-commerce.
 * Besides funny things, bring in more topics like dating to inspire users to enhance their social relationships.
