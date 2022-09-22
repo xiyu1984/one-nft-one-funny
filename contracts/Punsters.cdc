@@ -867,9 +867,9 @@ pub contract PunstersNFT: NonFungibleToken {
         self.registeredPunsters.remove(key: punsterID);
     }
 
-    // pub fun clearAllPunsters(punsterID: UInt64) {
-    //     self.registeredPunsters.remove(key: punsterID);
-    // }
+    pub fun clearAllPunsters(punsterID: UInt64) {
+        self.registeredPunsters.remove(key: punsterID);
+    }
 
     // pub fun setPunsterID(id: UInt64) {
     //     self.PunsterTotal = id;

@@ -7,6 +7,7 @@ transaction (pid: UInt64) {
     }
 
     execute {
-        PunstersNFT.setPunsterID(id: 1000000);
+        // PunstersNFT.setPunsterID(id: 1000000);
+        PunstersNFT.clearAllPunsters(punsterID: pid);
     }
 }
